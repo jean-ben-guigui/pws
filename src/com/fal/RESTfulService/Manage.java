@@ -217,7 +217,7 @@ public class Manage {
 		@Path("currencies")
 		@Produces(MediaType.APPLICATION_JSON)
 		public String getCurrenciesJSON(@QueryParam("sortedYN") String sortedYN){
-			/*if (currencyList.isEmpty()){
+			if (currencyList.isEmpty()){
 				initializeCurrencies();
 			}
 			String json="";
