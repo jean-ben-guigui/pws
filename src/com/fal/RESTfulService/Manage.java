@@ -21,8 +21,6 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
-import com.duver_flament.model.Currency;
-import com.duver_flament.model.Office;
 import com.fal.model.Group;
 import com.fal.model.User;
 import com.rest.DB.DBClass;
@@ -249,7 +247,7 @@ public class Manage {
 
 		}*/
 		
-		@GET
+		/*@GET
 		@Path("conversion/{source}/{destination}/{amount}")
 		public double convert (@PathParam("source")String source, @PathParam("destination")String destination,
 				@PathParam("amount")double amount) {
@@ -280,18 +278,18 @@ public class Manage {
 			return result;
 	}
 		
-		@GET
+		/*@GET
 		@Path("currencies")
 		@Produces(MediaType.TEXT_XML)
 		public String getCurrenciesXML(@QueryParam("sortedYN") String sortedYN){
 			/*if (currencyList.isEmpty()){
 				initializeCurrencies();
 			}*/
-			List<Currency> listResult = new ArrayList<>();
+			//List<Currency> listResult = new ArrayList<>();
 			/*for(Currency c : currencyList){
 				listResult.add(c);
 			}*/
-			if (sortedYN.equals("y")){
+			/*if (sortedYN.equals("y")){
 				
 				Collections.sort(listResult, new java.util.Comparator<Currency>() {
 
