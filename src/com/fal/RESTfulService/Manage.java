@@ -21,8 +21,6 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
-import com.duver_flament.model.Currency;
-import com.duver_flament.model.Office;
 import com.fal.model.Group;
 import com.fal.model.User;
 import com.rest.DB.DBClass;
@@ -213,75 +211,6 @@ public class Manage {
 		   return map.get(Integer.parseInt(id));
 
 		}*/
-		
-		@GET
-		@Path("conversion/{source}/{destination}/{amount}")
-		public double convert (@PathParam("source")String source, @PathParam("destination")String destination,
-				@PathParam("amount")double amount) {
-			 
-			double result = 0;
-			
-			if(source.equals("D")){
-				if (destination.equals("E"))
-					result = amount * 0.910;
-				else if (destination.equals("Y"))
-					result = amount * 	104.135;
-			}
-			
-			else if(source.equals("E")){
-				if (destination.equals("D"))
-					result = amount * 1.098;
-				else if (destination.equals("Y"))
-					result = amount * 	114.425;
-			}
-
-			else if(source.equals("Y")){
-				if (destination.equals("D"))
-					result = amount * 0.010;
-				else if (destination.equals("E"))
-					result = amount * 	0.009;
-			}
-			
-			return result;
-	}
-		
-		@GET
-		@Path("currencies")
-		@Produces(MediaType.TEXT_XML)
-		public String getCurrenciesXML(@QueryParam("sortedYN") String sortedYN){
-			/*if (currencyList.isEmpty()){
-				initializeCurrencies();
-			}*/
-			List<Currency> listResult = new ArrayList<>();
-			/*for(Currency c : currencyList){
-				listResult.add(c);
-			}*/
-			if (sortedYN.equals("y")){
-				
-				Collections.sort(listResult, new java.util.Comparator<Currency>() {
-
-					@Override
-					public int compare(Currency c1, Currency c2) {
-						
-						return c1.getName().compareTo(c2.getName());
-					}
-				}); 
-			}
-			String xml="";
-			xml="<?xml version=\"1.0\"?>"
-					+"<Currencies>";
-			for(Currency c : listResult){
-				xml+="<Currency>"
-						+ "<Country>"+c.getCountry()+"</Country>"
-						+ "<Name>" + c.getName()+"</Name>"
-						+ "<YearAdopted>"+c.getYearAdopted()+"</YearAdopted>"
-						+	"<Id>"+c.getId()+"</Id>"
-					+ "</Currency>";
-			}
-			xml+="</Currencies>";
-			System.out.println(xml);
-			return xml;
-		}
 		
 		
 		/*@GET
