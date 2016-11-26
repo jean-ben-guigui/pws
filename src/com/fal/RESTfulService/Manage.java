@@ -247,36 +247,7 @@ public class Manage {
 
 		}*/
 		
-		/*@GET
-		@Path("conversion/{source}/{destination}/{amount}")
-		public double convert (@PathParam("source")String source, @PathParam("destination")String destination,
-				@PathParam("amount")double amount) {
-			 
-			double result = 0;
-			
-			if(source.equals("D")){
-				if (destination.equals("E"))
-					result = amount * 0.910;
-				else if (destination.equals("Y"))
-					result = amount * 	104.135;
-			}
-			
-			else if(source.equals("E")){
-				if (destination.equals("D"))
-					result = amount * 1.098;
-				else if (destination.equals("Y"))
-					result = amount * 	114.425;
-			}
-
-			else if(source.equals("Y")){
-				if (destination.equals("D"))
-					result = amount * 0.010;
-				else if (destination.equals("E"))
-					result = amount * 	0.009;
-			}
-			
-			return result;
-	}
+		
 		
 		/*@GET
 		@Path("currencies")
