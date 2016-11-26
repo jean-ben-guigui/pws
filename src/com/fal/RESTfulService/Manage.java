@@ -178,7 +178,7 @@ public class Manage {
 			}*/
 			 
 			String adminGroup = jsonArray.toString();
-			//if(adminGroup == à l utilisateur connecté)
+			//if(adminGroup == à l utilisateur connecté) utiliser la fonction getUserLog()
 			PreparedStatement ps = connection.prepareStatement(
 					"UPDATE group" 
 					+ "SET description=?"
@@ -205,9 +205,6 @@ public class Manage {
 			ps.setString(1,uName);
 			return "";
 		}
-
-
-
 		
 		 @GET
 		 @Path("users")
