@@ -34,7 +34,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-@Path("currencyConverter")
+@Path("manage")
 public class Manage {
 		
 		@POST
@@ -178,7 +178,7 @@ public class Manage {
 			}*/
 			 
 			String adminGroup = jsonArray.toString();
-			//if(adminGroup == à l utilisateur connecté)
+			//if(adminGroup == à l utilisateur connecté) utiliser la fonction getUserLog()
 			PreparedStatement ps = connection.prepareStatement(
 					"UPDATE group" 
 					+ "SET description=?"
@@ -188,8 +188,23 @@ public class Manage {
 			ps.executeUpdate();
 			return "";
 		}
-
-
+		
+		@POST
+		@Path("groups_v3")
+		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+		public String joinGroup(
+				@FormParam("groupe_name") String grName
+	            ) throws Exception
+		{
+			Connection connection = DBClass.returnConnection();
+			String uName = null; //utiliser la fonction getUserLogin()
+			PreparedStatement ps = connection.prepareStatement(
+					"INSERT INTO group (members)" + 
+					"VALUES(?)" + 
+					"WHERE name=" + grName);
+			ps.setString(1,uName);
+			return "";
+		}
 		
 		 @GET
 		 @Path("users")
@@ -248,11 +263,51 @@ public class Manage {
 		}*/
 		
 		
+		
+		/*@GET
+		@Path("currencies")
+		@Produces(MediaType.TEXT_XML)
+		public String getCurrenciesXML(@QueryParam("sortedYN") String sortedYN){
+			/*if (currencyList.isEmpty()){
+				initializeCurrencies();
+			}*/
+			//List<Currency> listResult = new ArrayList<>();
+			/*for(Currency c : currencyList){
+				listResult.add(c);
+			}*/
+			/*if (sortedYN.equals("y")){
+				
+				Collections.sort(listResult, new java.util.Comparator<Currency>() {
+
+					@Override
+					public int compare(Currency c1, Currency c2) {
+						
+						return c1.getName().compareTo(c2.getName());
+					}
+				}); 
+			}
+			String xml="";
+			xml="<?xml version=\"1.0\"?>"
+					+"<Currencies>";
+			for(Currency c : listResult){
+				xml+="<Currency>"
+						+ "<Country>"+c.getCountry()+"</Country>"
+						+ "<Name>" + c.getName()+"</Name>"
+						+ "<YearAdopted>"+c.getYearAdopted()+"</YearAdopted>"
+						+	"<Id>"+c.getId()+"</Id>"
+					+ "</Currency>";
+			}
+			xml+="</Currencies>";
+			System.out.println(xml);
+			return xml;
+		}
+		
+		
 		/*@GET
 		@Path("currencies")
 		@Produces(MediaType.APPLICATION_JSON)
 		public String getCurrenciesJSON(@QueryParam("sortedYN") String sortedYN){
-			if (currencyList.isEmpty()){
+			/*if (currencyList.isEmpty()){
 				initializeCurrencies();
 			}
 			String json="";
