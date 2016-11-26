@@ -162,9 +162,25 @@ public class Manage {
 		public String changeGroupDescription(
 				@FormParam("name") String name,
 	            @FormParam("description") String newDescription
-	            ) throws SQLException
+	            ) throws Exception
 		{
+			
 			Connection connection = DBClass.returnConnection();
+			
+			PreparedStatement ps_admin = connection.prepareStatement(
+					"SELECT admin FROM group WHERE name="+name
+			);
+			 ResultSet resultSet = ps_admin.executeQuery();
+			 ToJSON tojson = new ToJSON();
+			 JSONArray jsonArray = tojson.toJSONArray(resultSet);
+			 /*boolean isAdmin;
+			 for (int i = 0; i < jsonArray.length(); i++) {
+				   if(jsonArray.get(i).equals(name))
+					   isAdmin=true;
+			}*/
+			 
+			String adminGroup = jsonArray.toString();
+			//if(adminGroup == à l utilisateur connecté)
 			PreparedStatement ps = connection.prepareStatement(
 					"UPDATE group" 
 					+ "SET description=?"
