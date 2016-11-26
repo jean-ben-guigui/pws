@@ -188,6 +188,24 @@ public class Manage {
 			ps.executeUpdate();
 			return "";
 		}
+		
+		@POST
+		@Path("groups_v3")
+		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+		public String joinGroup(
+				@FormParam("groupe_name") String grName
+	            ) throws Exception
+		{
+			Connection connection = DBClass.returnConnection();
+			String uName = null; //utiliser la fonction getUserLogin()
+			PreparedStatement ps = connection.prepareStatement(
+					"INSERT INTO group (members)" + 
+					"VALUES(?)" + 
+					"WHERE name=" + grName);
+			ps.setString(1,uName);
+			return "";
+		}
+
 
 
 		
