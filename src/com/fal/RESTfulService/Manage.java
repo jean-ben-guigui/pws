@@ -155,6 +155,25 @@ public class Manage {
 			ps.executeUpdate();
 			return "";
 		}
+		
+		@POST
+		@Path("groups_v2")
+		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+		public String changeGroupDescription(
+				@FormParam("name") String name,
+	            @FormParam("description") String newDescription
+	            ) throws SQLException
+		{
+			Connection connection = DBClass.returnConnection();
+			PreparedStatement ps = connection.prepareStatement(
+					"UPDATE group" 
+					+ "SET description=?"
+					+ "WHERE name=?");
+			ps.setString(1,newDescription);
+			ps.setString(2,name);
+			ps.executeUpdate();
+			return "";
+		}
 
 
 		
