@@ -6,6 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.json.JsonObject;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -28,6 +31,8 @@ import com.rest.util.ToJSON;
 import com.sun.corba.se.spi.orbutil.fsm.State;
 import com.sun.msv.datatype.xsd.Comparator;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -36,7 +41,22 @@ import java.sql.Statement;
 
 @Path("manage")
 public class Manage {
-		
+	
+	@POST
+	@Path("sign-in")
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	public void signIn(
+			@FormParam("email") String email) throws SQLException, IOException
+	{
+		Connection connection = DBClass.returnConnection();
+		PreparedStatement ps = connection.prepareStatement("SELECT email FROM user where email = ?");
+		ps.setString(1,email);
+		ResultSet rs = ps.executeQuery();
+		if(rs!=null){
+			
+		}
+	}
+	
 		@POST
 		@Path("user_v2")
 		@Consumes(MediaType.APPLICATION_JSON)
@@ -121,11 +141,11 @@ public class Manage {
 		@POST
 		@Path("users_v1")
 		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-		public String addUser(
+		public Response addUser(
 				@FormParam("email") String email,
 	            @FormParam("lastname") String lastname,
 	            @FormParam("firstname") String firstname,
-	            @FormParam("biography") String biography) throws SQLException
+	            @FormParam("biography") String biography) throws SQLException, URISyntaxException
 		{
 			Connection connection = DBClass.returnConnection();
 			PreparedStatement ps = connection.prepareStatement("INSERT INTO user (email,lastname,firstname,biography)" + "VALUES(?,?,?,?)");
@@ -134,7 +154,8 @@ public class Manage {
 			ps.setString(3,firstname);
 			ps.setString(4,biography);
 			ps.executeUpdate();
-			return "";
+			java.net.URI location = new java.net.URI("http://localhost:9090/pws/v1/manageApp/manage/users");
+			return Response.seeOther(location).build();
 		}
 		
 		@POST
@@ -151,6 +172,7 @@ public class Manage {
 			ps.setString(2,description);
 			//ps.setString(3,admin); TROUVER UN MOYEN DE TROUVER L'ADMIN AUTOMATIQUEMENT SANS LE RENTRER
 			ps.executeUpdate();
+			
 			return "";
 		}
 		
@@ -239,8 +261,6 @@ public class Manage {
 				 return Response.status(412).build();
 			 return Response.status(200).entity(output).build();
 		 }
-		
-		 
 		
 		/*@GET
 		@Path("currency/{id}")
