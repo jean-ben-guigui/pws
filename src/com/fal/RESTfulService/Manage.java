@@ -10,12 +10,14 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -28,6 +30,7 @@ import com.rest.util.ToJSON;
 import com.sun.corba.se.spi.orbutil.fsm.State;
 import com.sun.msv.datatype.xsd.Comparator;
 
+import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -121,7 +124,7 @@ public class Manage {
 		@POST
 		@Path("users_v1")
 		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-		public String addUser(
+		public Response addUser(
 				@FormParam("email") String email,
 	            @FormParam("lastname") String lastname,
 	            @FormParam("firstname") String firstname,
@@ -134,7 +137,23 @@ public class Manage {
 			ps.setString(3,firstname);
 			ps.setString(4,biography);
 			ps.executeUpdate();
-			return "";
+			
+			java.net.URI location;
+			try {
+				location = new java.net.URI("manage/user?email="+email);
+				return Response.seeOther(location).build();
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		    //return Response.temporaryRedirect(location).build();
+			try {
+				getUser(email);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return Response.status(Status.ACCEPTED).build();
 		}
 		
 		@POST
@@ -152,6 +171,66 @@ public class Manage {
 			//ps.setString(3,admin); TROUVER UN MOYEN DE TROUVER L'ADMIN AUTOMATIQUEMENT SANS LE RENTRER
 			ps.executeUpdate();
 			return "";
+		}
+		
+		@PUT
+		@Path("users_v2")
+		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+		public void changeLastnameUser(
+				@FormParam("lastname") String lastname
+	            ) throws Exception
+		{
+			
+			Connection connection = DBClass.returnConnection();
+			//emailduUser = email du user connecté
+			PreparedStatement ps = connection.prepareStatement(
+					"UPDATE user" 
+					+ "SET lastname=?"
+					+ "WHERE email=?");
+			ps.setString(1,lastname);
+			//ps.setString(2,emailduUser);
+			ps.executeUpdate();
+			//return "";
+		}
+		
+		@PUT
+		@Path("users_v3")
+		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+		public void changeFirstnameUser(
+	            @FormParam("firstname") String firstname
+	            ) throws Exception
+		{
+			
+			Connection connection = DBClass.returnConnection();
+			//emailduUser = email du user connecté
+			PreparedStatement ps = connection.prepareStatement(
+					"UPDATE user" 
+					+ "SET firstname=?"
+					+ "WHERE email=?");
+			ps.setString(1,firstname);
+			//ps.setString(2,emailduUser);
+			ps.executeUpdate();
+			//return "";
+		}
+		
+		@PUT
+		@Path("users_v4")
+		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+		public void changeBiographyUser(
+	            @FormParam("biography") String biography
+	            ) throws Exception
+		{
+			
+			Connection connection = DBClass.returnConnection();
+			//emailduUser = email du user connecté
+			PreparedStatement ps = connection.prepareStatement(
+					"UPDATE user" 
+					+ "SET biography=?"
+					+ "WHERE email=?");
+			ps.setString(1,biography);
+			//ps.setString(2,emailduUser);
+			ps.executeUpdate();
+			//return "";
 		}
 		
 		@POST
@@ -222,15 +301,16 @@ public class Manage {
 		 }
 		 
 		 @GET
-		 @Path("office")
+		 @Path("user")
 		 @Produces(MediaType.APPLICATION_JSON)
 		 public Response getUser(@QueryParam ("email")String email) throws Exception{
 			 Connection connection = DBClass.returnConnection();
+			 String mail = email.replace("%40", "@");
 			 PreparedStatement ps = connection.prepareStatement(
 	                 "SELECT * FROM user WHERE email=?"
 	                 );
 
-	         ps.setString(1,email);
+	         ps.setString(1,mail);
 			 ResultSet resultSet = ps.executeQuery();
 			 ToJSON tojson = new ToJSON();
 			 JSONArray jsonArray = tojson.toJSONArray(resultSet);
@@ -239,101 +319,5 @@ public class Manage {
 				 return Response.status(412).build();
 			 return Response.status(200).entity(output).build();
 		 }
-		
-		 
-		
-		/*@GET
-		@Path("currency/{id}")
-		public String getUserById(@PathParam("id") String id) {
-			
-			/*List<JsonObject> = 
-			
-			
-		
-			HashMap<Integer, String> map = new HashMap<>();
-			for (Currency c : userList){
-				map.put(c.getId(), c.getName());
-			}
-			
-		   if (map.get(Integer.parseInt(id))==null){
-			   return "Erreur : pas de monnaie à cet indice ! ";
-		   }
-		   return map.get(Integer.parseInt(id));
-
-		}*/
-		
-		
-		
-		/*@GET
-		@Path("currencies")
-		@Produces(MediaType.TEXT_XML)
-		public String getCurrenciesXML(@QueryParam("sortedYN") String sortedYN){
-			/*if (currencyList.isEmpty()){
-				initializeCurrencies();
-			}*/
-			//List<Currency> listResult = new ArrayList<>();
-			/*for(Currency c : currencyList){
-				listResult.add(c);
-			}*/
-			/*if (sortedYN.equals("y")){
-				
-				Collections.sort(listResult, new java.util.Comparator<Currency>() {
-
-					@Override
-					public int compare(Currency c1, Currency c2) {
-						
-						return c1.getName().compareTo(c2.getName());
-					}
-				}); 
-			}
-			String xml="";
-			xml="<?xml version=\"1.0\"?>"
-					+"<Currencies>";
-			for(Currency c : listResult){
-				xml+="<Currency>"
-						+ "<Country>"+c.getCountry()+"</Country>"
-						+ "<Name>" + c.getName()+"</Name>"
-						+ "<YearAdopted>"+c.getYearAdopted()+"</YearAdopted>"
-						+	"<Id>"+c.getId()+"</Id>"
-					+ "</Currency>";
-			}
-			xml+="</Currencies>";
-			System.out.println(xml);
-			return xml;
-		}
-		
-		
-		/*@GET
-		@Path("currencies")
-		@Produces(MediaType.APPLICATION_JSON)
-		public String getCurrenciesJSON(@QueryParam("sortedYN") String sortedYN){
-			/*if (currencyList.isEmpty()){
-				initializeCurrencies();
-			}
-			String json="";
-			List<Currency> listResult = new ArrayList<>();
-			for(Currency c : currencyList){
-				listResult.add(c);
-			}
-			if (sortedYN.equals("y")){
-				
-				Collections.sort(listResult, new java.util.Comparator<Currency>() {
-
-					@Override
-					public int compare(Currency c1, Currency c2) {
-						
-						return c1.getName().compareTo(c2.getName());
-					}
-				}); 
-			}
-			json+="\"Currencies\":[";
-			for(Currency c : listResult){
-				json+="{\"Country\":\"" + c.getCountry() + "\", \"Name\":\""+c.getName()+"\",\"YearAdopted\":\""+c.getYearAdopted()+"\", \"Id\":\""+c.getId()+"\"},";
-			}
-			json=json.substring(0, json.length()-1);
-			json+="]";
-			System.out.println(json);
-			return json;
-		}*/
 
 }

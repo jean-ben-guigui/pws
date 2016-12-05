@@ -10,10 +10,6 @@ public class User {
 	private String biography;
 	private List<Group> groups;
 	
-	
-	
-
-	
 
 
 	public User(String email, String firstname, String lastname, String biography) {
