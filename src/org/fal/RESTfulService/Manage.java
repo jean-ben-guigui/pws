@@ -283,30 +283,7 @@ public class Manage {
             }
         }
 		
-		// Rejoindre un groupe via un formulaire (Fab')
-		@POST
-<<<<<<< HEAD
-		@Path("groups_v3")
-		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-		public String joinGroup(
-				@FormParam("groupe_name") String grName
-	            ) throws Exception
-		{
-			Connection connection = DBClass.returnConnection();
-			String uName = null; //utiliser la fonction getUserLogin()
-			PreparedStatement ps = connection.prepareStatement(
-					"INSERT INTO group (members)" + 
-					"VALUES(?)" + 
-					"WHERE name=" + grName);
-			ps.setString(1,uName);
-			return "";
-		}
-		
 		//Supprimer un groupe via un formulaire + bouton
-		@POST
-		@Path("groups_v4")
-		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-=======
         @Path("groups_jg")
         @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
         public String joinGroup(
@@ -323,8 +300,7 @@ public class Manage {
             ps.setString(2, grName);
             return "";
         }
-
->>>>>>> branch 'master' of https://github.com/jean-ben-guigui/pws.git
+        
 		public void deleteGroup(@FormParam("name") String name) throws SQLException
 		{
 			
