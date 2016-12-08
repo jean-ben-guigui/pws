@@ -39,11 +39,13 @@ import java.sql.Statement;
 
 @Path("manage")
 public class Manage {
-		
+	
+	private User currentUser = new User();
+	
 		@POST
 		@Path("user_v2")
 		@Consumes(MediaType.APPLICATION_JSON)
-		public Response addUser(String incomingData) throws JSONException
+ 		public Response addUser(String incomingData) throws JSONException
 		{
 			JSONObject jsonObject = new JSONObject(incomingData);
 			String email = jsonObject.getString("email");

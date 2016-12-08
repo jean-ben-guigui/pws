@@ -11,6 +11,12 @@ public class User {
 	private List<Group> groups;
 	
 
+	
+
+	public User() {
+		super();
+	}
+
 
 	public User(String email, String firstname, String lastname, String biography) {
 		super();
