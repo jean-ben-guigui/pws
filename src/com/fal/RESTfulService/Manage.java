@@ -42,6 +42,7 @@ public class Manage {
 	
 	private User currentUser = new User();
 	
+		//Ajoute un utilisateur dans la bdd à partir du json
 		@POST
 		@Path("user_v2")
 		@Consumes(MediaType.APPLICATION_JSON)
@@ -63,6 +64,7 @@ public class Manage {
 			}
 		}
 		
+		//Ajoute un groupe dans la bdd à partir du json
 		@POST
 		@Path("group_v2")
 		@Consumes(MediaType.APPLICATION_JSON)
@@ -83,6 +85,7 @@ public class Manage {
 			}
 		}
 		
+		//Ajoute un user dans la bdd à patir d'un user
 		public int InsertUserIntoTheDataBase(User user) 
 		{
 			Connection connection = DBClass.returnConnection(); 
@@ -102,6 +105,7 @@ public class Manage {
 			}
 		}
 		
+		//Ajoute un groupe dans la bdd à patir d'un user
 		public int InsertGroupIntoTheDataBase(Group group) 
 		{
 			Connection connection = DBClass.returnConnection(); 
@@ -120,10 +124,12 @@ public class Manage {
 			}
 		}
 		
+		//Ajouter un user dans la bdd à partir d'un formulaire
 		@POST
 		@Path("users_v1")
 		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 		public Response addUser(
+
 				@FormParam("email") String email,
 	            @FormParam("lastname") String lastname,
 	            @FormParam("firstname") String firstname,
@@ -156,6 +162,8 @@ public class Manage {
 			return Response.status(Status.ACCEPTED).build();
 		}
 		
+		
+		//Ajouter un groupe dans la bdd à partir d'un formulaire
 		@POST
 		@Path("groups_v1")
 		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -173,6 +181,8 @@ public class Manage {
 			return "";
 		}
 		
+		
+		//Changement du nom dans la bdd à partir d'un formulaire 
 		@PUT
 		@Path("users_v2")
 		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -193,6 +203,8 @@ public class Manage {
 			//return "";
 		}
 		
+		
+		//Changement du prenom dans la bdd à partir d'un formulaire
 		@PUT
 		@Path("users_v3")
 		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -213,6 +225,8 @@ public class Manage {
 			//return "";
 		}
 		
+		
+		//Changement de la biographie dans la bdd à partir d'un formulaire
 		@PUT
 		@Path("users_v4")
 		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -233,6 +247,8 @@ public class Manage {
 			//return "";
 		}
 		
+		
+		//Changement de la description du groupe via un formulaire// seulement si tu es admin
 		@POST
 		@Path("groups_v2")
 		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -268,6 +284,8 @@ public class Manage {
 			return "";
 		}
 		
+		
+		// Rejoindre un groupe via un formulaire
 		@POST
 		@Path("groups_v3")
 		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -285,15 +303,35 @@ public class Manage {
 			return "";
 		}
 
+		
+		//Supprimer un groupe via un formulaire + bouton
+		@POST
+		@Path("groups_v4")
+		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 		public void deleteGroup(@FormParam("name") String name) throws SQLException
 		{
+			
 			Connection connection = DBClass.returnConnection();
+			
+			try {
+				PreparedStatement ps0 = connection.prepareStatement("SELECT admin FROM groups WHERE name= ?");
+				ps0.setString(1,name);
+				ResultSet resultSet = ps0.executeQuery();
+				ToJSON tojson = new ToJSON();
+				JSONArray jsonArray;
+				jsonArray = tojson.toJSONArray(resultSet);
+				String output = jsonArray.toString();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 			PreparedStatement ps = connection.prepareStatement("DELETE FROM group WHERE name = ?");
 			ps.setString(1,name);
 			//ps.setString(3,admin); TROUVER UN MOYEN DE TROUVER L'ADMIN AUTOMATIQUEMENT SANS LE RENTRER
 			ps.executeUpdate();
 			PreparedStatement psbis = connection.prepareStatement("DELETE FROM user_group WHERE id_group = ?");
-			ps.setString(1,name);
+			psbis.setString(1,name);
 			//ps.setString(3,admin); TROUVER UN MOYEN DE TROUVER L'ADMIN AUTOMATIQUEMENT SANS LE RENTRER
 			psbis.executeUpdate();
 		}
@@ -306,10 +344,11 @@ public class Manage {
 			ps.executeUpdate();
 		}
 		
-		 @GET
+		//Renvoie sous format json tous les users
+		@GET
 		 @Path("users")
 		 @Produces(MediaType.APPLICATION_JSON)
-		 public String getUsers() throws Exception{
+		public String getUsers() throws Exception{
 			 Connection connection = DBClass.returnConnection();
 			 PreparedStatement ps = connection.prepareStatement(
 					 "SELECT * FROM user"
@@ -321,7 +360,8 @@ public class Manage {
 			 return jsonArray.toString();
 		 }
 		 
-		 @GET
+		//Renvoie le user dont l'email est placé en paramètre dans l'url 
+		@GET
 		 @Path("user")
 		 @Produces(MediaType.APPLICATION_JSON)
 		 public Response getUser(@QueryParam ("email")String email) throws Exception{
