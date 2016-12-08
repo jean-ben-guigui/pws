@@ -6,9 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.json.JsonObject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -31,8 +28,6 @@ import com.rest.util.ToJSON;
 import com.sun.corba.se.spi.orbutil.fsm.State;
 import com.sun.msv.datatype.xsd.Comparator;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -41,6 +36,8 @@ import java.sql.Statement;
 
 @Path("manage")
 public class Manage {
+
+	private User currentUser = new User();
 	
 	@POST
 	@Path("sign-in")
@@ -56,7 +53,6 @@ public class Manage {
 			
 		}
 	}
-	
 		@POST
 		@Path("user_v2")
 		@Consumes(MediaType.APPLICATION_JSON)
@@ -145,7 +141,7 @@ public class Manage {
 				@FormParam("email") String email,
 	            @FormParam("lastname") String lastname,
 	            @FormParam("firstname") String firstname,
-	            @FormParam("biography") String biography) throws SQLException, URISyntaxException
+	            @FormParam("biography") String biography) throws SQLException
 		{
 			Connection connection = DBClass.returnConnection();
 			PreparedStatement ps = connection.prepareStatement("INSERT INTO user (email,lastname,firstname,biography)" + "VALUES(?,?,?,?)");
@@ -154,8 +150,18 @@ public class Manage {
 			ps.setString(3,firstname);
 			ps.setString(4,biography);
 			ps.executeUpdate();
-			java.net.URI location = new java.net.URI("http://localhost:9090/pws/v1/manageApp/manage/users");
-			return Response.seeOther(location).build();
+			
+			java.net.URI location;
+			try {
+				//location = new java.net.URI("manage/user?email="+email);
+				location = new java.net.URI("../../index.html");
+				return Response.seeOther(location).build();
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			return Response.status(Status.ACCEPTED).build();
 		}
 		
 		@POST
@@ -172,7 +178,6 @@ public class Manage {
 			ps.setString(2,description);
 			//ps.setString(3,admin); TROUVER UN MOYEN DE TROUVER L'ADMIN AUTOMATIQUEMENT SANS LE RENTRER
 			ps.executeUpdate();
-			
 			return "";
 		}
 		
@@ -228,6 +233,30 @@ public class Manage {
 			return "";
 		}
 		
+		
+		public void deleteGroup(@FormParam("name") String name) throws SQLException
+		{
+			Connection connection = DBClass.returnConnection();
+			PreparedStatement ps = connection.prepareStatement("DELETE FROM group WHERE name = ?");
+			ps.setString(1,name);
+			//ps.setString(3,admin); TROUVER UN MOYEN DE TROUVER L'ADMIN AUTOMATIQUEMENT SANS LE RENTRER
+			ps.executeUpdate();
+			PreparedStatement psbis = connection.prepareStatement("DELETE FROM user_group WHERE id_group = ?");
+			ps.setString(1,name);
+			//ps.setString(3,admin); TROUVER UN MOYEN DE TROUVER L'ADMIN AUTOMATIQUEMENT SANS LE RENTRER
+			psbis.executeUpdate();
+		}
+		
+		public void leaveGroup(@FormParam("name") String name) throws SQLException{
+			Connection connection = DBClass.returnConnection();
+			PreparedStatement ps = connection.prepareStatement("DELETE FROM user_group WHERE id_group = ? AND id_user= ?");
+			ps.setString(1,name);
+			//ps.setString(2,admin); TROUVER UN MOYEN DE TROUVER L'ADMIN AUTOMATIQUEMENT SANS LE RENTRER
+			ps.executeUpdate();
+		}
+		
+		
+		
 		 @GET
 		 @Path("users")
 		 @Produces(MediaType.APPLICATION_JSON)
@@ -261,6 +290,8 @@ public class Manage {
 				 return Response.status(412).build();
 			 return Response.status(200).entity(output).build();
 		 }
+		
+		 
 		
 		/*@GET
 		@Path("currency/{id}")
