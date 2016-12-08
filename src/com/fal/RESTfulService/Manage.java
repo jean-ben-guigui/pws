@@ -6,16 +6,21 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.json.JsonObject;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -28,6 +33,11 @@ import com.rest.util.ToJSON;
 import com.sun.corba.se.spi.orbutil.fsm.State;
 import com.sun.msv.datatype.xsd.Comparator;
 
+<<<<<<< HEAD
+import java.io.IOException;
+=======
+>>>>>>> branch 'master' of https://github.com/jean-ben-guigui/pws.git
+import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -36,9 +46,8 @@ import java.sql.Statement;
 
 @Path("manage")
 public class Manage {
-
-	private User currentUser = new User();
 	
+<<<<<<< HEAD
 	@POST
 	@Path("sign-in")
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -53,10 +62,14 @@ public class Manage {
 			
 		}
 	}
+=======
+	private User currentUser = new User();
+>>>>>>> branch 'master' of https://github.com/jean-ben-guigui/pws.git
+	
 		@POST
 		@Path("user_v2")
 		@Consumes(MediaType.APPLICATION_JSON)
-		public Response addUser(String incomingData) throws JSONException
+ 		public Response addUser(String incomingData) throws JSONException
 		{
 			JSONObject jsonObject = new JSONObject(incomingData);
 			String email = jsonObject.getString("email");
@@ -94,7 +107,6 @@ public class Manage {
 			}
 		}
 		
-		
 		public int InsertUserIntoTheDataBase(User user) 
 		{
 			Connection connection = DBClass.returnConnection(); 
@@ -131,8 +143,6 @@ public class Manage {
 				return 400;
 			}
 		}
-
-
 		
 		@POST
 		@Path("users_v1")
@@ -141,7 +151,7 @@ public class Manage {
 				@FormParam("email") String email,
 	            @FormParam("lastname") String lastname,
 	            @FormParam("firstname") String firstname,
-	            @FormParam("biography") String biography) throws SQLException
+	            @FormParam("biography") String biography) throws SQLException, URISyntaxException
 		{
 			Connection connection = DBClass.returnConnection();
 			PreparedStatement ps = connection.prepareStatement("INSERT INTO user (email,lastname,firstname,biography)" + "VALUES(?,?,?,?)");
@@ -150,6 +160,10 @@ public class Manage {
 			ps.setString(3,firstname);
 			ps.setString(4,biography);
 			ps.executeUpdate();
+<<<<<<< HEAD
+			java.net.URI location = new java.net.URI("http://localhost:9090/pws/v1/manageApp/manage/users");
+			return Response.seeOther(location).build();
+=======
 			
 			java.net.URI location;
 			try {
@@ -160,8 +174,15 @@ public class Manage {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
+		    //return Response.temporaryRedirect(location).build();
+			try {
+				getUser(email);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			return Response.status(Status.ACCEPTED).build();
+>>>>>>> branch 'master' of https://github.com/jean-ben-guigui/pws.git
 		}
 		
 		@POST
@@ -178,7 +199,68 @@ public class Manage {
 			ps.setString(2,description);
 			//ps.setString(3,admin); TROUVER UN MOYEN DE TROUVER L'ADMIN AUTOMATIQUEMENT SANS LE RENTRER
 			ps.executeUpdate();
+			
 			return "";
+		}
+		
+		@PUT
+		@Path("users_v2")
+		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+		public void changeLastnameUser(
+				@FormParam("lastname") String lastname
+	            ) throws Exception
+		{
+			
+			Connection connection = DBClass.returnConnection();
+			//emailduUser = email du user connecté
+			PreparedStatement ps = connection.prepareStatement(
+					"UPDATE user" 
+					+ "SET lastname=?"
+					+ "WHERE email=?");
+			ps.setString(1,lastname);
+			//ps.setString(2,emailduUser);
+			ps.executeUpdate();
+			//return "";
+		}
+		
+		@PUT
+		@Path("users_v3")
+		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+		public void changeFirstnameUser(
+	            @FormParam("firstname") String firstname
+	            ) throws Exception
+		{
+			
+			Connection connection = DBClass.returnConnection();
+			//emailduUser = email du user connecté
+			PreparedStatement ps = connection.prepareStatement(
+					"UPDATE user" 
+					+ "SET firstname=?"
+					+ "WHERE email=?");
+			ps.setString(1,firstname);
+			//ps.setString(2,emailduUser);
+			ps.executeUpdate();
+			//return "";
+		}
+		
+		@PUT
+		@Path("users_v4")
+		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+		public void changeBiographyUser(
+	            @FormParam("biography") String biography
+	            ) throws Exception
+		{
+			
+			Connection connection = DBClass.returnConnection();
+			//emailduUser = email du user connecté
+			PreparedStatement ps = connection.prepareStatement(
+					"UPDATE user" 
+					+ "SET biography=?"
+					+ "WHERE email=?");
+			ps.setString(1,biography);
+			//ps.setString(2,emailduUser);
+			ps.executeUpdate();
+			//return "";
 		}
 		
 		@POST
@@ -232,8 +314,7 @@ public class Manage {
 			ps.setString(1,uName);
 			return "";
 		}
-		
-		
+
 		public void deleteGroup(@FormParam("name") String name) throws SQLException
 		{
 			Connection connection = DBClass.returnConnection();
@@ -255,8 +336,6 @@ public class Manage {
 			ps.executeUpdate();
 		}
 		
-		
-		
 		 @GET
 		 @Path("users")
 		 @Produces(MediaType.APPLICATION_JSON)
@@ -273,15 +352,16 @@ public class Manage {
 		 }
 		 
 		 @GET
-		 @Path("office")
+		 @Path("user")
 		 @Produces(MediaType.APPLICATION_JSON)
 		 public Response getUser(@QueryParam ("email")String email) throws Exception{
 			 Connection connection = DBClass.returnConnection();
+			 String mail = email.replace("%40", "@");
 			 PreparedStatement ps = connection.prepareStatement(
 	                 "SELECT * FROM user WHERE email=?"
 	                 );
 
-	         ps.setString(1,email);
+	         ps.setString(1,mail);
 			 ResultSet resultSet = ps.executeQuery();
 			 ToJSON tojson = new ToJSON();
 			 JSONArray jsonArray = tojson.toJSONArray(resultSet);
@@ -290,8 +370,7 @@ public class Manage {
 				 return Response.status(412).build();
 			 return Response.status(200).entity(output).build();
 		 }
-		
-		 
+<<<<<<< HEAD
 		
 		/*@GET
 		@Path("currency/{id}")
@@ -386,5 +465,7 @@ public class Manage {
 			System.out.println(json);
 			return json;
 		}*/
+=======
+>>>>>>> branch 'master' of https://github.com/jean-ben-guigui/pws.git
 
 }
