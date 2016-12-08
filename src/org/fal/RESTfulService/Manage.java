@@ -7,7 +7,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import javax.json.JsonObject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -31,8 +30,7 @@ import com.rest.util.ToJSON;
 
 @Path("manage")
 public class Manage {
-	
-<<<<<<< HEAD
+	private User currentUser = new User();
 	
 	@POST
 	@Path("sign-in")
@@ -53,39 +51,15 @@ public class Manage {
 			} catch (URISyntaxException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-=======
-		private User currentUser = new User();
-		
-		@POST
-		@Path("sign-in")
-		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-		public void signIn(
-				@FormParam("email") String email) throws SQLException, IOException
-		{
-			Connection connection = DBClass.returnConnection();
-			PreparedStatement ps = connection.prepareStatement("SELECT email FROM user where email = ?");
-			ps.setString(1,email);
-			ResultSet rs = ps.executeQuery();
-			if(rs!=null){
-				
->>>>>>> refs/remotes/origin/master
-			}
 		}
-<<<<<<< HEAD
+		}
 		return Response.status(Status.ACCEPTED).build();
 	}
-	
-	@POST
-	@Path("sign-up")
-	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-	public void signIn(
-=======
-		
+
 		@POST
 		@Path("sign-up")
 		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-		public void signIn(
->>>>>>> refs/remotes/origin/master
+		public void signUp(
 			@FormParam("email") String email,
 			@FormParam("lastname") String lastname,
 			@FormParam("firstname") String firstname,
@@ -377,7 +351,7 @@ public class Manage {
 				ToJSON tojson = new ToJSON();
 				JSONArray jsonArray;
 				jsonArray = tojson.toJSONArray(resultSet);
-				JsonObject obj = (JsonObject) jsonArray.getJSONObject(0);
+				JSONObject obj = (JSONObject) jsonArray.getJSONObject(0);
 				String admin = jsonArray.toString();
 				if (admin.equals(currentUser.getEmail())){
 					PreparedStatement ps = connection.prepareStatement("DELETE FROM group WHERE name = ?");
@@ -386,7 +360,6 @@ public class Manage {
 					ps.executeUpdate();
 					PreparedStatement psbis = connection.prepareStatement("DELETE FROM user_group WHERE id_group = ?");
 					psbis.setString(1,name);
-					//ps.setString(3,admin); TROUVER UN MOYEN DE TROUVER L'ADMIN AUTOMATIQUEMENT SANS LE RENTRER
 					psbis.executeUpdate();
 				}
 			} catch (Exception e) {
