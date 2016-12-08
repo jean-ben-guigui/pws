@@ -1,21 +1,18 @@
-package com.fal.RESTfulService;
+package org.fal.RESTfulService;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-import javax.json.JsonObject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
@@ -30,15 +27,6 @@ import com.fal.model.Group;
 import com.fal.model.User;
 import com.rest.DB.DBClass;
 import com.rest.util.ToJSON;
-import com.sun.corba.se.spi.orbutil.fsm.State;
-import com.sun.msv.datatype.xsd.Comparator;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 
 @Path("manage")
 public class Manage {
@@ -60,8 +48,25 @@ public class Manage {
 		}
 	}
 	
+	@POST
+	@Path("sign-in")
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	public void signIn(
+			@FormParam("email") String email,
+			@FormParam("email") String lastname,
+			@FormParam("email") String firstname,
+			@FormParam("email") String biography) throws SQLException, IOException
+	{
+		Connection connection = DBClass.returnConnection();
+		PreparedStatement ps = connection.prepareStatement("SELECT email FROM user where email = ?");
+		ps.setString(1,email);
+		ResultSet rs = ps.executeQuery();
+		if(rs!=null){
+			
+		}
+	}
 	
-		//Ajoute un utilisateur dans la bdd à partir du json
+	
 		@POST
 		@Path("user_v2")
 		@Consumes(MediaType.APPLICATION_JSON)
@@ -83,7 +88,6 @@ public class Manage {
 			}
 		}
 		
-		//Ajoute un groupe dans la bdd à partir du json
 		@POST
 		@Path("group_v2")
 		@Consumes(MediaType.APPLICATION_JSON)
@@ -104,7 +108,6 @@ public class Manage {
 			}
 		}
 		
-		//Ajoute un user dans la bdd à patir d'un user
 		public int InsertUserIntoTheDataBase(User user) 
 		{
 			Connection connection = DBClass.returnConnection(); 
@@ -124,7 +127,6 @@ public class Manage {
 			}
 		}
 		
-		//Ajoute un groupe dans la bdd à patir d'un user
 		public int InsertGroupIntoTheDataBase(Group group) 
 		{
 			Connection connection = DBClass.returnConnection(); 
@@ -143,12 +145,10 @@ public class Manage {
 			}
 		}
 		
-		//Ajouter un user dans la bdd à partir d'un formulaire
 		@POST
 		@Path("users_v1")
 		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 		public Response addUser(
-
 				@FormParam("email") String email,
 	            @FormParam("lastname") String lastname,
 	            @FormParam("firstname") String firstname,
@@ -174,8 +174,6 @@ public class Manage {
 			return Response.status(Status.ACCEPTED).build();
 		}
 		
-		
-		//Ajouter un groupe dans la bdd à partir d'un formulaire
 		@POST
 		@Path("groups_v1")
 		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -194,8 +192,6 @@ public class Manage {
 			return "";
 		}
 		
-		
-		//Changement du nom dans la bdd à partir d'un formulaire 
 		@PUT
 		@Path("users_v2")
 		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -216,8 +212,6 @@ public class Manage {
 			//return "";
 		}
 		
-		
-		//Changement du prenom dans la bdd à partir d'un formulaire
 		@PUT
 		@Path("users_v3")
 		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -238,8 +232,6 @@ public class Manage {
 			//return "";
 		}
 		
-		
-		//Changement de la biographie dans la bdd à partir d'un formulaire
 		@PUT
 		@Path("users_v4")
 		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -260,8 +252,6 @@ public class Manage {
 			//return "";
 		}
 		
-		
-		//Changement de la description du groupe via un formulaire// seulement si tu es admin
 		@POST
 		@Path("groups_v2")
 		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -297,8 +287,6 @@ public class Manage {
 			return "";
 		}
 		
-		
-		// Rejoindre un groupe via un formulaire
 		@POST
 		@Path("groups_v3")
 		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -316,60 +304,31 @@ public class Manage {
 			return "";
 		}
 
-		
-		//Supprimer un groupe via un formulaire + bouton
-		@POST
-		@Path("groups_v4")
-		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 		public void deleteGroup(@FormParam("name") String name) throws SQLException
 		{
-			
 			Connection connection = DBClass.returnConnection();
-			
-			try {
-				
-				PreparedStatement ps0 = connection.prepareStatement("SELECT admin FROM groups WHERE name = ?");
-				ps0.setString(1,name);
-				ResultSet resultSet = ps0.executeQuery();
-				ToJSON tojson = new ToJSON();
-				JSONArray jsonArray;
-				jsonArray = tojson.toJSONArray(resultSet);
-				JsonObject obj = (JsonObject) jsonArray.getJSONObject(0);
-				String admin = jsonArray.toString();
-				if (admin.equals(currentUser.getEmail())){
-					PreparedStatement ps = connection.prepareStatement("DELETE FROM group WHERE name = ?");
-					ps.setString(1,name);
-					//ps.setString(3,admin); TROUVER UN MOYEN DE TROUVER L'ADMIN AUTOMATIQUEMENT SANS LE RENTRER
-					ps.executeUpdate();
-					PreparedStatement psbis = connection.prepareStatement("DELETE FROM user_group WHERE id_group = ?");
-					psbis.setString(1,name);
-					//ps.setString(3,admin); TROUVER UN MOYEN DE TROUVER L'ADMIN AUTOMATIQUEMENT SANS LE RENTRER
-					psbis.executeUpdate();
-				}
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			PreparedStatement ps = connection.prepareStatement("DELETE FROM group WHERE name = ?");
+			ps.setString(1,name);
+			//ps.setString(3,admin); TROUVER UN MOYEN DE TROUVER L'ADMIN AUTOMATIQUEMENT SANS LE RENTRER
+			ps.executeUpdate();
+			PreparedStatement psbis = connection.prepareStatement("DELETE FROM user_group WHERE id_group = ?");
+			ps.setString(1,name);
+			//ps.setString(3,admin); TROUVER UN MOYEN DE TROUVER L'ADMIN AUTOMATIQUEMENT SANS LE RENTRER
+			psbis.executeUpdate();
 		}
 		
-		
-		//Quitter un groupe via un formulaire + bouton
-		@POST
-		@Path("groups_v5")
-		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 		public void leaveGroup(@FormParam("name") String name) throws SQLException{
 			Connection connection = DBClass.returnConnection();
-			PreparedStatement ps = connection.prepareStatement("DELETE FROM user_group WHERE group_id = ? AND user_id = ?");
+			PreparedStatement ps = connection.prepareStatement("DELETE FROM user_group WHERE id_group = ? AND id_user= ?");
 			ps.setString(1,name);
-			ps.setString(2,currentUser.getEmail());
+			//ps.setString(2,admin); TROUVER UN MOYEN DE TROUVER L'ADMIN AUTOMATIQUEMENT SANS LE RENTRER
 			ps.executeUpdate();
 		}
 		
-		//Renvoie sous format json tous les users
-		@GET
+		 @GET
 		 @Path("users")
 		 @Produces(MediaType.APPLICATION_JSON)
-		public String getUsers() throws Exception{
+		 public String getUsers() throws Exception{
 			 Connection connection = DBClass.returnConnection();
 			 PreparedStatement ps = connection.prepareStatement(
 					 "SELECT * FROM user"
@@ -381,8 +340,7 @@ public class Manage {
 			 return jsonArray.toString();
 		 }
 		 
-		//Renvoie le user dont l'email est placé en paramètre dans l'url 
-		@GET
+		 @GET
 		 @Path("user")
 		 @Produces(MediaType.APPLICATION_JSON)
 		 public Response getUser(@QueryParam ("email")String email) throws Exception{
@@ -402,4 +360,97 @@ public class Manage {
 			 return Response.status(200).entity(output).build();
 		 }
 		
+		/*@GET
+		@Path("currency/{id}")
+		public String getUserById(@PathParam("id") String id) {
+			
+			/*List<JsonObject> = 
+			
+			
+		
+			HashMap<Integer, String> map = new HashMap<>();
+			for (Currency c : userList){
+				map.put(c.getId(), c.getName());
+			}
+			
+		   if (map.get(Integer.parseInt(id))==null){
+			   return "Erreur : pas de monnaie à cet indice ! ";
+		   }
+		   return map.get(Integer.parseInt(id));
+
+		}*/
+		
+		
+		
+		/*@GET
+		@Path("currencies")
+		@Produces(MediaType.TEXT_XML)
+		public String getCurrenciesXML(@QueryParam("sortedYN") String sortedYN){
+			/*if (currencyList.isEmpty()){
+				initializeCurrencies();
+			}*/
+			//List<Currency> listResult = new ArrayList<>();
+			/*for(Currency c : currencyList){
+				listResult.add(c);
+			}*/
+			/*if (sortedYN.equals("y")){
+				
+				Collections.sort(listResult, new java.util.Comparator<Currency>() {
+
+					@Override
+					public int compare(Currency c1, Currency c2) {
+						
+						return c1.getName().compareTo(c2.getName());
+					}
+				}); 
+			}
+			String xml="";
+			xml="<?xml version=\"1.0\"?>"
+					+"<Currencies>";
+			for(Currency c : listResult){
+				xml+="<Currency>"
+						+ "<Country>"+c.getCountry()+"</Country>"
+						+ "<Name>" + c.getName()+"</Name>"
+						+ "<YearAdopted>"+c.getYearAdopted()+"</YearAdopted>"
+						+	"<Id>"+c.getId()+"</Id>"
+					+ "</Currency>";
+			}
+			xml+="</Currencies>";
+			System.out.println(xml);
+			return xml;
+		}
+		
+		
+		/*@GET
+		@Path("currencies")
+		@Produces(MediaType.APPLICATION_JSON)
+		public String getCurrenciesJSON(@QueryParam("sortedYN") String sortedYN){
+			/*if (currencyList.isEmpty()){
+				initializeCurrencies();
+			}
+			String json="";
+			List<Currency> listResult = new ArrayList<>();
+			for(Currency c : currencyList){
+				listResult.add(c);
+			}
+			if (sortedYN.equals("y")){
+				
+				Collections.sort(listResult, new java.util.Comparator<Currency>() {
+
+					@Override
+					public int compare(Currency c1, Currency c2) {
+						
+						return c1.getName().compareTo(c2.getName());
+					}
+				}); 
+			}
+			json+="\"Currencies\":[";
+			for(Currency c : listResult){
+				json+="{\"Country\":\"" + c.getCountry() + "\", \"Name\":\""+c.getName()+"\",\"YearAdopted\":\""+c.getYearAdopted()+"\", \"Id\":\""+c.getId()+"\"},";
+			}
+			json=json.substring(0, json.length()-1);
+			json+="]";
+			System.out.println(json);
+			return json;
+		}*/
 }
