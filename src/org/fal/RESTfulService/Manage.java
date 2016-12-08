@@ -250,56 +250,51 @@ public class Manage {
 		}
 		
 		@POST
-		@Path("groups_v2")
-		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-		public String changeGroupDescription(
-				@FormParam("name") String name,
-	            @FormParam("description") String newDescription
-	            ) throws Exception
-		{
-			
-			Connection connection = DBClass.returnConnection();
-			
-			PreparedStatement ps_admin = connection.prepareStatement(
-					"SELECT admin FROM group WHERE name="+name
-			);
-			 ResultSet resultSet = ps_admin.executeQuery();
-			 ToJSON tojson = new ToJSON();
-			 JSONArray jsonArray = tojson.toJSONArray(resultSet);
-			 /*boolean isAdmin;
-			 for (int i = 0; i < jsonArray.length(); i++) {
-				   if(jsonArray.get(i).equals(name))
-					   isAdmin=true;
-			}*/
-			 
-			String adminGroup = jsonArray.toString();
-			//if(adminGroup == à l utilisateur connecté) utiliser la fonction getUserLog()
-			PreparedStatement ps = connection.prepareStatement(
-					"UPDATE group" 
-					+ "SET description=?"
-					+ "WHERE name=?");
-			ps.setString(1,newDescription);
-			ps.setString(2,name);
-			ps.executeUpdate();
-			return "";
-		}
+        @Path("groups_cgd")
+        @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+        public void changeGroupDescription(
+                @FormParam("name") String name,
+                @FormParam("description") String newDescription
+                ) throws Exception
+        {
+            
+            Connection connection = DBClass.returnConnection();
+            
+            PreparedStatement ps_admin = connection.prepareStatement(
+                    "SELECT admin FROM group WHERE name="+name
+            );
+             ResultSet resultSet = ps_admin.executeQuery();
+             ToJSON tojson = new ToJSON();
+             JSONArray jsonArray = tojson.toJSONArray(resultSet);
+            String adminGroup = jsonArray.toString();
+            if(adminGroup == currentUser.getEmail()){
+                PreparedStatement ps = connection.prepareStatement(
+                        "UPDATE group" 
+                        + "SET description=?"
+                        + "WHERE name=?");
+                ps.setString(1,newDescription);
+                ps.setString(2,name);
+                ps.executeUpdate();
+            }
+        }
 		
 		@POST
-		@Path("groups_v3")
-		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-		public String joinGroup(
-				@FormParam("groupe_name") String grName
-	            ) throws Exception
-		{
-			Connection connection = DBClass.returnConnection();
-			String uName = null; //utiliser la fonction getUserLogin()
-			PreparedStatement ps = connection.prepareStatement(
-					"INSERT INTO group (members)" + 
-					"VALUES(?)" + 
-					"WHERE name=" + grName);
-			ps.setString(1,uName);
-			return "";
-		}
+        @Path("groups_jg")
+        @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+        public String joinGroup(
+                @FormParam("name") String grName
+                ) throws Exception
+        {
+            Connection connection = DBClass.returnConnection();
+            String uName = currentUser.getEmail();
+            PreparedStatement ps = connection.prepareStatement(
+                    "INSERT INTO user_group (user_id,group_id)" + 
+                    "VALUES(?,?)"
+                    );
+            ps.setString(1,uName);
+            ps.setString(2, grName);
+            return "";
+        }
 
 		public void deleteGroup(@FormParam("name") String name) throws SQLException
 		{
