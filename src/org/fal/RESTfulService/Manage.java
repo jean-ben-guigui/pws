@@ -31,7 +31,7 @@ import com.rest.util.ToJSON;
 @Path("manage")
 public class Manage {
 	private User currentUser = new User();
-
+	
 	
 	@POST
 	@Path("sign-in")
@@ -49,21 +49,20 @@ public class Manage {
 	}
 	
 	@POST
-	@Path("sign-in")
+	@Path("sign-up")
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public void signIn(
 			@FormParam("email") String email,
-			@FormParam("email") String lastname,
-			@FormParam("email") String firstname,
-			@FormParam("email") String biography) throws SQLException, IOException
+			@FormParam("lastname") String lastname,
+			@FormParam("firstname") String firstname,
+			@FormParam("biography") String biography) throws SQLException, IOException
 	{
-		Connection connection = DBClass.returnConnection();
-		PreparedStatement ps = connection.prepareStatement("SELECT email FROM user where email = ?");
-		ps.setString(1,email);
-		ResultSet rs = ps.executeQuery();
-		if(rs!=null){
-			
-		}
+		currentUser.setEmail(email);
+		currentUser.setBiography(biography);
+		currentUser.setFirstname(firstname);
+		currentUser.setLastname(lastname);
+		
+		InsertUserIntoTheDataBase(currentUser);
 	}
 	
 	
@@ -183,10 +182,10 @@ public class Manage {
 	            ) throws SQLException
 		{
 			Connection connection = DBClass.returnConnection();
-			PreparedStatement ps = connection.prepareStatement("INSERT INTO group (name,description)" + "VALUES(?,?)");
+			PreparedStatement ps = connection.prepareStatement("INSERT INTO group (name,description)" + "VALUES(?,?,?)");
 			ps.setString(1,name);
 			ps.setString(2,description);
-			//ps.setString(3,admin); TROUVER UN MOYEN DE TROUVER L'ADMIN AUTOMATIQUEMENT SANS LE RENTRER
+			ps.setString(3,currentUser.getEmail());
 			ps.executeUpdate();
 			
 			return "";
