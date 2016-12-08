@@ -36,7 +36,7 @@ public class Manage {
 	@POST
 	@Path("sign-in")
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-	public void signIn(
+	public Response signIn(
 			@FormParam("email") String email) throws SQLException, IOException
 	{
 		Connection connection = DBClass.returnConnection();
@@ -44,8 +44,17 @@ public class Manage {
 		ps.setString(1,email);
 		ResultSet rs = ps.executeQuery();
 		if(rs!=null){
-			
+			java.net.URI location;
+			try {
+				//location = new java.net.URI("manage/user?email="+email);
+				location = new java.net.URI("../../index.html");
+				return Response.seeOther(location).build();
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
+		return Response.status(Status.ACCEPTED).build();
 	}
 	
 	@POST
@@ -64,6 +73,21 @@ public class Manage {
 		
 		InsertUserIntoTheDataBase(currentUser);
 	}
+	
+	@POST
+	@Path("writeOnBoard")
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	public void writeOnBoard(
+            @FormParam("message") String message,
+    		@FormParam("group") String group) throws SQLException
+	{
+		Connection connection = DBClass.returnConnection();
+		PreparedStatement ps = connection.prepareStatement("INSERT INTO board (group_id, message)" + "VALUES(?,?)");
+		ps.setString(1,group);
+		ps.setString(2,currentUser.getFirstname() + " " + currentUser.getLastname() + ": " + message);
+		ps.executeUpdate();
+	}
+	
 	
 	
 		@POST
