@@ -180,6 +180,23 @@ public class Manage {
 		
 		//Ajouter un groupe dans la bdd à partir d'un formulaire
 		@POST
+        @Path("groups_dma")
+        @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+        public String deleteMyAccount(
+                @FormParam("name") String grName
+                ) throws Exception
+        {
+            Connection connection = DBClass.returnConnection();
+            String uName = currentUser.getEmail();
+            PreparedStatement ps = connection.prepareStatement(
+                    "DELETE FROM 'user'" + 
+                    "WHERE email=?"
+                    );
+            ps.setString(1,currentUser.getEmail());
+            return "";
+        }
+		
+		@POST
 		@Path("groups_v1")
 		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 		public void addGroup(
