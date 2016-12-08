@@ -42,23 +42,24 @@ import java.sql.Statement;
 
 @Path("manage")
 public class Manage {
-	private User currentUser = new User();
+	
+		private User currentUser = new User();
 
 	
-	@POST
-	@Path("sign-in")
-	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-	public void signIn(
+		@POST
+		@Path("sign-in")
+		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+		public void signIn(
 			@FormParam("email") String email) throws SQLException, IOException
-	{
-		Connection connection = DBClass.returnConnection();
-		PreparedStatement ps = connection.prepareStatement("SELECT email FROM user where email = ?");
-		ps.setString(1,email);
-		ResultSet rs = ps.executeQuery();
-		if(rs!=null){
-			
+		{
+			Connection connection = DBClass.returnConnection();
+			PreparedStatement ps = connection.prepareStatement("SELECT email FROM user where email = ?");
+			ps.setString(1,email);
+			ResultSet rs = ps.executeQuery();
+			if(rs!=null){
+				
+			}
 		}
-	}
 	
 	
 		//Ajoute un utilisateur dans la bdd à partir du json
@@ -179,19 +180,17 @@ public class Manage {
 		@POST
 		@Path("groups_v1")
 		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-		public String addGroup(
+		public void addGroup(
 				@FormParam("name") String name,
 	            @FormParam("description") String description
 	            ) throws SQLException
 		{
 			Connection connection = DBClass.returnConnection();
-			PreparedStatement ps = connection.prepareStatement("INSERT INTO group (name,description)" + "VALUES(?,?)");
+			PreparedStatement ps = connection.prepareStatement("INSERT INTO group (name,description,admin)" + "VALUES(?,?,?)");
 			ps.setString(1,name);
 			ps.setString(2,description);
-			//ps.setString(3,admin); TROUVER UN MOYEN DE TROUVER L'ADMIN AUTOMATIQUEMENT SANS LE RENTRER
+			ps.setString(3,currentUser.getEmail());
 			ps.executeUpdate();
-			
-			return "";
 		}
 		
 		
