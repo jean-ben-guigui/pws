@@ -1,21 +1,18 @@
-package com.fal.RESTfulService;
+package org.fal.RESTfulService;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-import javax.json.JsonObject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
@@ -30,15 +27,6 @@ import com.fal.model.Group;
 import com.fal.model.User;
 import com.rest.DB.DBClass;
 import com.rest.util.ToJSON;
-import com.sun.corba.se.spi.orbutil.fsm.State;
-import com.sun.msv.datatype.xsd.Comparator;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 
 @Path("manage")
 public class Manage {
@@ -50,6 +38,24 @@ public class Manage {
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public void signIn(
 			@FormParam("email") String email) throws SQLException, IOException
+	{
+		Connection connection = DBClass.returnConnection();
+		PreparedStatement ps = connection.prepareStatement("SELECT email FROM user where email = ?");
+		ps.setString(1,email);
+		ResultSet rs = ps.executeQuery();
+		if(rs!=null){
+			
+		}
+	}
+	
+	@POST
+	@Path("sign-in")
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	public void signIn(
+			@FormParam("email") String email,
+			@FormParam("email") String lastname,
+			@FormParam("email") String firstname,
+			@FormParam("email") String biography) throws SQLException, IOException
 	{
 		Connection connection = DBClass.returnConnection();
 		PreparedStatement ps = connection.prepareStatement("SELECT email FROM user where email = ?");

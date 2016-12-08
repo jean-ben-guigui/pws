@@ -1,4 +1,4 @@
-package com.fal.RESTfulService;
+package org.fal.RESTfulService;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
