@@ -176,7 +176,7 @@ public class Manage {
 		@POST
 		@Path("groups_v1")
 		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-		public String addGroup(
+		public void addGroup(
 				@FormParam("name") String name,
 	            @FormParam("description") String description
 	            ) throws SQLException
@@ -187,8 +187,6 @@ public class Manage {
 			ps.setString(2,description);
 			ps.setString(3,currentUser.getEmail());
 			ps.executeUpdate();
-			
-			return "";
 		}
 		
 		@PUT
