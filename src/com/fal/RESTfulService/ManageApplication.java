@@ -5,5 +5,4 @@ import javax.ws.rs.core.Application;
 @ApplicationPath("v1/manageApp")
 public class ManageApplication  extends Application{
 
-
 }
