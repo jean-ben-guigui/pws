@@ -32,11 +32,7 @@ import com.rest.DB.DBClass;
 import com.rest.util.ToJSON;
 import com.sun.corba.se.spi.orbutil.fsm.State;
 import com.sun.msv.datatype.xsd.Comparator;
-
-<<<<<<< HEAD
 import java.io.IOException;
-=======
->>>>>>> branch 'master' of https://github.com/jean-ben-guigui/pws.git
 import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -46,8 +42,9 @@ import java.sql.Statement;
 
 @Path("manage")
 public class Manage {
+	private User currentUser = new User();
+
 	
-<<<<<<< HEAD
 	@POST
 	@Path("sign-in")
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -62,9 +59,7 @@ public class Manage {
 			
 		}
 	}
-=======
-	private User currentUser = new User();
->>>>>>> branch 'master' of https://github.com/jean-ben-guigui/pws.git
+	
 	
 		@POST
 		@Path("user_v2")
@@ -160,10 +155,6 @@ public class Manage {
 			ps.setString(3,firstname);
 			ps.setString(4,biography);
 			ps.executeUpdate();
-<<<<<<< HEAD
-			java.net.URI location = new java.net.URI("http://localhost:9090/pws/v1/manageApp/manage/users");
-			return Response.seeOther(location).build();
-=======
 			
 			java.net.URI location;
 			try {
@@ -174,15 +165,7 @@ public class Manage {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		    //return Response.temporaryRedirect(location).build();
-			try {
-				getUser(email);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 			return Response.status(Status.ACCEPTED).build();
->>>>>>> branch 'master' of https://github.com/jean-ben-guigui/pws.git
 		}
 		
 		@POST
@@ -370,7 +353,6 @@ public class Manage {
 				 return Response.status(412).build();
 			 return Response.status(200).entity(output).build();
 		 }
-<<<<<<< HEAD
 		
 		/*@GET
 		@Path("currency/{id}")
@@ -465,7 +447,4 @@ public class Manage {
 			System.out.println(json);
 			return json;
 		}*/
-=======
->>>>>>> branch 'master' of https://github.com/jean-ben-guigui/pws.git
-
 }
