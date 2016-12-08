@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import javax.json.JsonObject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -30,8 +31,8 @@ import com.rest.util.ToJSON;
 
 @Path("manage")
 public class Manage {
-	private User currentUser = new User();
 	
+<<<<<<< HEAD
 	
 	@POST
 	@Path("sign-in")
@@ -52,8 +53,25 @@ public class Manage {
 			} catch (URISyntaxException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+=======
+		private User currentUser = new User();
+		
+		@POST
+		@Path("sign-in")
+		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+		public void signIn(
+				@FormParam("email") String email) throws SQLException, IOException
+		{
+			Connection connection = DBClass.returnConnection();
+			PreparedStatement ps = connection.prepareStatement("SELECT email FROM user where email = ?");
+			ps.setString(1,email);
+			ResultSet rs = ps.executeQuery();
+			if(rs!=null){
+				
+>>>>>>> refs/remotes/origin/master
 			}
 		}
+<<<<<<< HEAD
 		return Response.status(Status.ACCEPTED).build();
 	}
 	
@@ -61,6 +79,13 @@ public class Manage {
 	@Path("sign-up")
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public void signIn(
+=======
+		
+		@POST
+		@Path("sign-up")
+		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+		public void signIn(
+>>>>>>> refs/remotes/origin/master
 			@FormParam("email") String email,
 			@FormParam("lastname") String lastname,
 			@FormParam("firstname") String firstname,
@@ -89,7 +114,7 @@ public class Manage {
 	}
 	
 	
-	
+		//Ajoute un utilisateur dans la bdd à partir du json
 		@POST
 		@Path("user_v2")
 		@Consumes(MediaType.APPLICATION_JSON)
@@ -111,6 +136,7 @@ public class Manage {
 			}
 		}
 		
+		//Ajoute un groupe dans la bdd à partir du json
 		@POST
 		@Path("group_v2")
 		@Consumes(MediaType.APPLICATION_JSON)
@@ -131,6 +157,7 @@ public class Manage {
 			}
 		}
 		
+		//Ajoute un user dans la bdd à patir d'un user
 		public int InsertUserIntoTheDataBase(User user) 
 		{
 			Connection connection = DBClass.returnConnection(); 
@@ -150,6 +177,7 @@ public class Manage {
 			}
 		}
 		
+		//Ajoute un groupe dans la bdd à patir d'un user
 		public int InsertGroupIntoTheDataBase(Group group) 
 		{
 			Connection connection = DBClass.returnConnection(); 
@@ -168,6 +196,7 @@ public class Manage {
 			}
 		}
 		
+		//Ajouter un user dans la bdd à partir d'un formulaire
 		@POST
 		@Path("users_v1")
 		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -197,6 +226,22 @@ public class Manage {
 			return Response.status(Status.ACCEPTED).build();
 		}
 		
+		//Supprimer son propre compte (via bouton)
+		@POST
+        @Path("groups_dma")
+        @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+        public String deleteMyAccount() throws Exception
+        {
+            Connection connection = DBClass.returnConnection();
+            PreparedStatement ps = connection.prepareStatement(
+                    "DELETE FROM 'user'" + 
+                    "WHERE email=?"
+                    );
+            ps.setString(1,currentUser.getEmail());
+            return "";
+        }
+		
+		//Ajouter un groupe dans la bdd à partir d'un formulaire
 		@POST
 		@Path("groups_v1")
 		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -213,6 +258,7 @@ public class Manage {
 			ps.executeUpdate();
 		}
 		
+		//Changement du nom dans la bdd à partir d'un formulaire 
 		@PUT
 		@Path("users_v2")
 		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -228,11 +274,11 @@ public class Manage {
 					+ "SET lastname=?"
 					+ "WHERE email=?");
 			ps.setString(1,lastname);
-			//ps.setString(2,emailduUser);
+			ps.setString(2,currentUser.getEmail());
 			ps.executeUpdate();
-			//return "";
 		}
 		
+		//Changement du prenom dans la bdd à partir d'un formulaire
 		@PUT
 		@Path("users_v3")
 		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -242,17 +288,16 @@ public class Manage {
 		{
 			
 			Connection connection = DBClass.returnConnection();
-			//emailduUser = email du user connecté
 			PreparedStatement ps = connection.prepareStatement(
 					"UPDATE user" 
 					+ "SET firstname=?"
 					+ "WHERE email=?");
 			ps.setString(1,firstname);
-			//ps.setString(2,emailduUser);
+			ps.setString(2,currentUser.getEmail());
 			ps.executeUpdate();
-			//return "";
 		}
 		
+		//Changement de la biographie dans la bdd à partir d'un formulaire
 		@PUT
 		@Path("users_v4")
 		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -262,94 +307,112 @@ public class Manage {
 		{
 			
 			Connection connection = DBClass.returnConnection();
-			//emailduUser = email du user connecté
 			PreparedStatement ps = connection.prepareStatement(
 					"UPDATE user" 
 					+ "SET biography=?"
 					+ "WHERE email=?");
 			ps.setString(1,biography);
-			//ps.setString(2,emailduUser);
+			ps.setString(2,currentUser.getEmail());
 			ps.executeUpdate();
-			//return "";
 		}
 		
+		//Changement de la description du groupe via un formulaire// seulement si tu es admin(Fab')
 		@POST
-		@Path("groups_v2")
-		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-		public String changeGroupDescription(
-				@FormParam("name") String name,
-	            @FormParam("description") String newDescription
-	            ) throws Exception
-		{
-			
-			Connection connection = DBClass.returnConnection();
-			
-			PreparedStatement ps_admin = connection.prepareStatement(
-					"SELECT admin FROM group WHERE name="+name
-			);
-			 ResultSet resultSet = ps_admin.executeQuery();
-			 ToJSON tojson = new ToJSON();
-			 JSONArray jsonArray = tojson.toJSONArray(resultSet);
-			 /*boolean isAdmin;
-			 for (int i = 0; i < jsonArray.length(); i++) {
-				   if(jsonArray.get(i).equals(name))
-					   isAdmin=true;
-			}*/
-			 
-			String adminGroup = jsonArray.toString();
-			//if(adminGroup == à l utilisateur connecté) utiliser la fonction getUserLog()
-			PreparedStatement ps = connection.prepareStatement(
-					"UPDATE group" 
-					+ "SET description=?"
-					+ "WHERE name=?");
-			ps.setString(1,newDescription);
-			ps.setString(2,name);
-			ps.executeUpdate();
-			return "";
-		}
+        @Path("groups_cgd")
+        @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+        public void changeGroupDescription(
+                @FormParam("name") String name,
+                @FormParam("description") String newDescription
+                ) throws Exception
+        {
+            
+            Connection connection = DBClass.returnConnection();
+            
+            PreparedStatement ps_admin = connection.prepareStatement(
+                    "SELECT admin FROM group WHERE name="+name
+            );
+             ResultSet resultSet = ps_admin.executeQuery();
+             ToJSON tojson = new ToJSON();
+             JSONArray jsonArray = tojson.toJSONArray(resultSet);
+            String adminGroup = jsonArray.toString();
+            if(adminGroup == currentUser.getEmail()){
+                PreparedStatement ps = connection.prepareStatement(
+                        "UPDATE group" 
+                        + "SET description=?"
+                        + "WHERE name=?");
+                ps.setString(1,newDescription);
+                ps.setString(2,name);
+                ps.executeUpdate();
+            }
+        }
 		
-		@POST
-		@Path("groups_v3")
-		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-		public String joinGroup(
-				@FormParam("groupe_name") String grName
-	            ) throws Exception
-		{
-			Connection connection = DBClass.returnConnection();
-			String uName = null; //utiliser la fonction getUserLogin()
-			PreparedStatement ps = connection.prepareStatement(
-					"INSERT INTO group (members)" + 
-					"VALUES(?)" + 
-					"WHERE name=" + grName);
-			ps.setString(1,uName);
-			return "";
-		}
-
+		//Supprimer un groupe via un formulaire + bouton
+        @Path("groups_jg")
+        @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+        public String joinGroup(
+                @FormParam("name") String grName
+                ) throws Exception
+        {
+            Connection connection = DBClass.returnConnection();
+            String uName = currentUser.getEmail();
+            PreparedStatement ps = connection.prepareStatement(
+                    "INSERT INTO user_group (user_id,group_id)" + 
+                    "VALUES(?,?)"
+                    );
+            ps.setString(1,uName);
+            ps.setString(2, grName);
+            return "";
+        }
+        
 		public void deleteGroup(@FormParam("name") String name) throws SQLException
 		{
+			
 			Connection connection = DBClass.returnConnection();
-			PreparedStatement ps = connection.prepareStatement("DELETE FROM group WHERE name = ?");
-			ps.setString(1,name);
-			//ps.setString(3,admin); TROUVER UN MOYEN DE TROUVER L'ADMIN AUTOMATIQUEMENT SANS LE RENTRER
-			ps.executeUpdate();
-			PreparedStatement psbis = connection.prepareStatement("DELETE FROM user_group WHERE id_group = ?");
-			ps.setString(1,name);
-			//ps.setString(3,admin); TROUVER UN MOYEN DE TROUVER L'ADMIN AUTOMATIQUEMENT SANS LE RENTRER
-			psbis.executeUpdate();
+			
+			try {
+				
+				PreparedStatement ps0 = connection.prepareStatement("SELECT admin FROM groups WHERE name = ?");
+				ps0.setString(1,name);
+				ResultSet resultSet = ps0.executeQuery();
+				ToJSON tojson = new ToJSON();
+				JSONArray jsonArray;
+				jsonArray = tojson.toJSONArray(resultSet);
+				JsonObject obj = (JsonObject) jsonArray.getJSONObject(0);
+				String admin = jsonArray.toString();
+				if (admin.equals(currentUser.getEmail())){
+					PreparedStatement ps = connection.prepareStatement("DELETE FROM group WHERE name = ?");
+					ps.setString(1,name);
+					//ps.setString(3,admin); TROUVER UN MOYEN DE TROUVER L'ADMIN AUTOMATIQUEMENT SANS LE RENTRER
+					ps.executeUpdate();
+					PreparedStatement psbis = connection.prepareStatement("DELETE FROM user_group WHERE id_group = ?");
+					psbis.setString(1,name);
+					//ps.setString(3,admin); TROUVER UN MOYEN DE TROUVER L'ADMIN AUTOMATIQUEMENT SANS LE RENTRER
+					psbis.executeUpdate();
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
+		
+		//Quitter un groupe via un formulaire + bouton
+		@POST
+		@Path("groups_v5")
+		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 		public void leaveGroup(@FormParam("name") String name) throws SQLException{
 			Connection connection = DBClass.returnConnection();
-			PreparedStatement ps = connection.prepareStatement("DELETE FROM user_group WHERE id_group = ? AND id_user= ?");
+			PreparedStatement ps = connection.prepareStatement("DELETE FROM user_group WHERE group_id = ? AND user_id = ?");
 			ps.setString(1,name);
-			//ps.setString(2,admin); TROUVER UN MOYEN DE TROUVER L'ADMIN AUTOMATIQUEMENT SANS LE RENTRER
+			ps.setString(2,currentUser.getEmail());
 			ps.executeUpdate();
 		}
 		
-		 @GET
+		//Renvoie sous format json tous les users
+		@GET
 		 @Path("users")
 		 @Produces(MediaType.APPLICATION_JSON)
-		 public String getUsers() throws Exception{
+		public String getUsers() throws Exception{
 			 Connection connection = DBClass.returnConnection();
 			 PreparedStatement ps = connection.prepareStatement(
 					 "SELECT * FROM user"
@@ -361,7 +424,8 @@ public class Manage {
 			 return jsonArray.toString();
 		 }
 		 
-		 @GET
+		//Renvoie le user dont l'email est placé en paramètre dans l'url 
+		@GET
 		 @Path("user")
 		 @Produces(MediaType.APPLICATION_JSON)
 		 public Response getUser(@QueryParam ("email")String email) throws Exception{
@@ -381,97 +445,4 @@ public class Manage {
 			 return Response.status(200).entity(output).build();
 		 }
 		
-		/*@GET
-		@Path("currency/{id}")
-		public String getUserById(@PathParam("id") String id) {
-			
-			/*List<JsonObject> = 
-			
-			
-		
-			HashMap<Integer, String> map = new HashMap<>();
-			for (Currency c : userList){
-				map.put(c.getId(), c.getName());
-			}
-			
-		   if (map.get(Integer.parseInt(id))==null){
-			   return "Erreur : pas de monnaie à cet indice ! ";
-		   }
-		   return map.get(Integer.parseInt(id));
-
-		}*/
-		
-		
-		
-		/*@GET
-		@Path("currencies")
-		@Produces(MediaType.TEXT_XML)
-		public String getCurrenciesXML(@QueryParam("sortedYN") String sortedYN){
-			/*if (currencyList.isEmpty()){
-				initializeCurrencies();
-			}*/
-			//List<Currency> listResult = new ArrayList<>();
-			/*for(Currency c : currencyList){
-				listResult.add(c);
-			}*/
-			/*if (sortedYN.equals("y")){
-				
-				Collections.sort(listResult, new java.util.Comparator<Currency>() {
-
-					@Override
-					public int compare(Currency c1, Currency c2) {
-						
-						return c1.getName().compareTo(c2.getName());
-					}
-				}); 
-			}
-			String xml="";
-			xml="<?xml version=\"1.0\"?>"
-					+"<Currencies>";
-			for(Currency c : listResult){
-				xml+="<Currency>"
-						+ "<Country>"+c.getCountry()+"</Country>"
-						+ "<Name>" + c.getName()+"</Name>"
-						+ "<YearAdopted>"+c.getYearAdopted()+"</YearAdopted>"
-						+	"<Id>"+c.getId()+"</Id>"
-					+ "</Currency>";
-			}
-			xml+="</Currencies>";
-			System.out.println(xml);
-			return xml;
-		}
-		
-		
-		/*@GET
-		@Path("currencies")
-		@Produces(MediaType.APPLICATION_JSON)
-		public String getCurrenciesJSON(@QueryParam("sortedYN") String sortedYN){
-			/*if (currencyList.isEmpty()){
-				initializeCurrencies();
-			}
-			String json="";
-			List<Currency> listResult = new ArrayList<>();
-			for(Currency c : currencyList){
-				listResult.add(c);
-			}
-			if (sortedYN.equals("y")){
-				
-				Collections.sort(listResult, new java.util.Comparator<Currency>() {
-
-					@Override
-					public int compare(Currency c1, Currency c2) {
-						
-						return c1.getName().compareTo(c2.getName());
-					}
-				}); 
-			}
-			json+="\"Currencies\":[";
-			for(Currency c : listResult){
-				json+="{\"Country\":\"" + c.getCountry() + "\", \"Name\":\""+c.getName()+"\",\"YearAdopted\":\""+c.getYearAdopted()+"\", \"Id\":\""+c.getId()+"\"},";
-			}
-			json=json.substring(0, json.length()-1);
-			json+="]";
-			System.out.println(json);
-			return json;
-		}*/
 }
