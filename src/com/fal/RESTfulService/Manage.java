@@ -81,7 +81,6 @@ public class Manage {
 			}
 		}
 		
-		
 		public int InsertUserIntoTheDataBase(User user) 
 		{
 			Connection connection = DBClass.returnConnection(); 
@@ -118,8 +117,6 @@ public class Manage {
 				return 400;
 			}
 		}
-
-
 		
 		@POST
 		@Path("users_v1")
@@ -140,7 +137,8 @@ public class Manage {
 			
 			java.net.URI location;
 			try {
-				location = new java.net.URI("manage/user?email="+email);
+				//location = new java.net.URI("manage/user?email="+email);
+				location = new java.net.URI("../../index.html");
 				return Response.seeOther(location).build();
 			} catch (URISyntaxException e) {
 				// TODO Auto-generated catch block
@@ -283,6 +281,27 @@ public class Manage {
 					"WHERE name=" + grName);
 			ps.setString(1,uName);
 			return "";
+		}
+
+		public void deleteGroup(@FormParam("name") String name) throws SQLException
+		{
+			Connection connection = DBClass.returnConnection();
+			PreparedStatement ps = connection.prepareStatement("DELETE FROM group WHERE name = ?");
+			ps.setString(1,name);
+			//ps.setString(3,admin); TROUVER UN MOYEN DE TROUVER L'ADMIN AUTOMATIQUEMENT SANS LE RENTRER
+			ps.executeUpdate();
+			PreparedStatement psbis = connection.prepareStatement("DELETE FROM user_group WHERE id_group = ?");
+			ps.setString(1,name);
+			//ps.setString(3,admin); TROUVER UN MOYEN DE TROUVER L'ADMIN AUTOMATIQUEMENT SANS LE RENTRER
+			psbis.executeUpdate();
+		}
+		
+		public void leaveGroup(@FormParam("name") String name) throws SQLException{
+			Connection connection = DBClass.returnConnection();
+			PreparedStatement ps = connection.prepareStatement("DELETE FROM user_group WHERE id_group = ? AND id_user= ?");
+			ps.setString(1,name);
+			//ps.setString(2,admin); TROUVER UN MOYEN DE TROUVER L'ADMIN AUTOMATIQUEMENT SANS LE RENTRER
+			ps.executeUpdate();
 		}
 		
 		 @GET

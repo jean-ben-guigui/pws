@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html >
+<head>
+
+<title>groups</title>
+<link rel="stylesheet" href="css/bootstrap.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+<div class="container">
+	<h1> Les groupes... </h1>
+</div>
+<div class="container">
+	<form class="form-signin" method="POST" action="http://localhost:8080/wps/v1/converterApp/currencyConverter/groups_v2">
+		<h2 class="form-signin-heading">Change group's descritpion</h2>
+		<input class="form-control" type="text" required name="name" placeholder="name of the group">
+		<input class="form-control" type="text" required name="description" placeholder="new description of this group">
+		<button class="btn btn-lg btn-primary btn-block" type="submit">Validate</button>
+	</form>
+<div class="container">
+	<form class="form-signin" method="POST" action="http://localhost:8080/wps/v1/converterApp/currencyConverter/delete_group">
+		<h2 class="form-signin-heading">Delete a group</h2>
+		<input class="form-control" type="text" required name="name" placeholder="name of the group">
+		<button class="btn btn-lg btn-primary btn-block" type="submit">delete the group</button>
+	</form>
+</div>
+</body>
+</html>
