@@ -178,16 +178,13 @@ public class Manage {
 			return Response.status(Status.ACCEPTED).build();
 		}
 		
-		//Ajouter un groupe dans la bdd à partir d'un formulaire
+		//Supprimer son propre compte (via bouton)
 		@POST
         @Path("groups_dma")
         @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-        public String deleteMyAccount(
-                @FormParam("name") String grName
-                ) throws Exception
+        public String deleteMyAccount() throws Exception
         {
             Connection connection = DBClass.returnConnection();
-            String uName = currentUser.getEmail();
             PreparedStatement ps = connection.prepareStatement(
                     "DELETE FROM 'user'" + 
                     "WHERE email=?"
@@ -196,6 +193,7 @@ public class Manage {
             return "";
         }
 		
+		//Ajouter un groupe dans la bdd à partir d'un formulaire
 		@POST
 		@Path("groups_v1")
 		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
