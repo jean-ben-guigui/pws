@@ -32,24 +32,40 @@ import com.rest.util.ToJSON;
 @Path("manage")
 public class Manage {
 	
-	private User currentUser = new User();;
+	//private User currentUser = new User();;
 
 	
+	/**
+	* Allow a user to write on board.
+	* This function is called when we need to store a new message from the user into the database "writes" on the board of the group
+	* @param message the message which will be posted on the board
+	* @param group the group with the required board
+	* @throws SQLException
+	* @since 1.0
+	*/
 	@POST
 	@Path("writeOnBoard")
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 		public void writeOnBoard(
+			@FormParam("email") String email,	
             @FormParam("message") String message,
     		@FormParam("group") String group) throws SQLException
 	{
 		Connection connection = DBClass.returnConnection();
 		PreparedStatement ps = connection.prepareStatement("INSERT INTO board (group_id, message)" + "VALUES(?,?)");
 		ps.setString(1,group);
-		ps.setString(2,currentUser.getFirstname() + " " + currentUser.getLastname() + ": " + message);
+		ps.setString(2,email+ ": " + message);
 		ps.executeUpdate();
 	}
 	
-		//Ajoute un utilisateur dans la bdd à partir du json
+	/**
+	* Allow to add a user.
+	* This function is called when we need to store a new user into the database from a JSON
+	* @param incomingData a JSON Array converts into String
+	* @return ok if success, error if not
+	* @throws JSONException
+	* @since 1.0
+	*/
 		@POST
 		@Path("user_v2")
 		@Consumes(MediaType.APPLICATION_JSON)
@@ -71,8 +87,14 @@ public class Manage {
 			}
 		}
 		
-		//Ajoute un groupe dans la bdd à partir du json
-		@POST
+		/**
+		* Allow to add a group.
+		* This function is called when we need to store a new group into the database from a JSON
+		* @param incomingData a JSON Array converts into String
+		* @return ok if success, error if not
+		* @throws JSONException
+		* @since 1.0
+		*/		@POST
 		@Path("group_v2")
 		@Consumes(MediaType.APPLICATION_JSON)
 		public Response addGroup(String incomingData) throws JSONException
@@ -92,7 +114,13 @@ public class Manage {
 			}
 		}
 		
-		//Ajoute un user dans la bdd à patir d'un user
+		/**
+		* Allow to add a user into the database.
+		* This function is called when we need to register the current user's information into the database from its information
+		* @param user a user with all the needed information (email, lastname, ...)
+		* @return 200 if ok, 400 if not
+		* @since 1.0
+		*/
 		public int InsertUserIntoTheDataBase(User user) 
 		{
 			Connection connection = DBClass.returnConnection(); 
@@ -112,7 +140,13 @@ public class Manage {
 			}
 		}
 		
-		//Ajoute un groupe dans la bdd à patir d'un user
+		/**
+		* Allow to add a group into the database.
+		* This function is called when we need to register the group's information into the database from its information
+		* @param group a group with all the needed information (name, description, ...)
+		* @return 200 if ok, 400 if not
+		* @since 1.0
+		*/
 		public int InsertGroupIntoTheDataBase(Group group) 
 		{
 			Connection connection = DBClass.returnConnection(); 
@@ -131,7 +165,18 @@ public class Manage {
 			}
 		}
 		
-		//Ajouter un user dans la bdd à partir d'un formulaire
+
+		/**
+		* Allow to add a user.
+		* This function is called when we need to store a new user into the database from a form
+		* @param email the email of the user
+		* @param lastname the lastname of the user
+		* @param firstname the firstname of the user
+		* @param biography the biography of the user		
+		* @throws SQLException
+		* @throws URISyntaxException
+		* @since 1.0
+		*/		
 		@POST
 		@Path("users_v1")
 		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -161,7 +206,14 @@ public class Manage {
 			return Response.status(Status.ACCEPTED).build();
 		}
 		
-		//Supprimer son propre compte (via bouton)
+		/**
+		* Allow to delete an user account.
+		* This function is called when we need to delete an user account from the database with a button and a form
+		* @param email the email of the user	
+		* @throws Exception
+		* @return redirection on an other web page
+		* @since 1.0
+		*/	
 		@POST
         @Path("user_dma")
         @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -186,7 +238,15 @@ public class Manage {
            
         }
 		
-		//Ajouter un groupe dans la bdd à partir d'un formulaire
+		/**
+		* Allow to add a group.
+		* This function is called when we need to store a new user into the database from a form
+		* @param email the email of the current user
+		* @param name the name of the group
+		* @param description the description of the group
+		* @throws SQLException
+		* @since 1.0
+		*/				
 		@POST
 		@Path("groups_v1")
 		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -214,7 +274,14 @@ public class Manage {
 			return Response.status(Status.ACCEPTED).build();
 		}
 		
-		//Changement du nom dans la bdd à partir d'un formulaire 
+		/**
+		* Allow to change the last name of a user.
+		* This function is called when we need to update the last name of the current user (from a form)
+		* @param email the email of the user
+		* @param lastname the last name of the user	
+		* @throws Exception
+		* @since 1.0
+		*/		
 		@POST
 		@Path("users_v2")
 		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -244,7 +311,14 @@ public class Manage {
 			}
 		}
 		
-		//Changement du prenom dans la bdd à partir d'un formulaire
+		/**
+		* Allow to change the first name of a user.
+		* This function is called when we need to update the first name of the current user (from a form)
+		* @param email the email of the user
+		* @param firstname the first name of the user	
+		* @throws Exception
+		* @since 1.0
+		*/			
 		@POST
 		@Path("users_v3")
 		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -272,7 +346,14 @@ public class Manage {
 		}
 		}
 		
-		//Changement de la biographie dans la bdd à partir d'un formulaire
+		/**
+		* Allow to change the biography of a user.
+		* This function is called when we need to update the biography of the current user (from a form)
+		* @param email the email of the user
+		* @param biography the lastname of the user	
+		* @throws Exception
+		* @since 1.0
+		*/			
 		@POST
 		@Path("users_v4")
 		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -300,7 +381,15 @@ public class Manage {
 		}
 		}
 		
-		//Changement de la description du groupe via un formulaire// seulement si tu es admin(Fab')
+		/**
+		* Allow to change the description of a group. 
+		* This function is called when we need to update the description of a group (from a form)
+		* @param email the email of the user (admin)
+		* @param name the name of the group
+		* @param description the new description of the group
+		* @throws Exception
+		* @since 1.0
+		*/			
 		@POST
         @Path("groups_cgd")
         @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -348,8 +437,15 @@ public class Manage {
 
         }
 		
-		//Rejoindre un groupe 
-        @POST
+		/**
+		* Allow a user to join a group. 
+		* This function is called when we need to insert a new user in a new group  into the database(from a form)
+		* @param name the name of the group
+		* @throws Exception
+		* @return  
+		* @since 1.0
+		*/			        
+		@POST
 		@Path("groups_jg")
         @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
         public Response joinGroup(
@@ -378,11 +474,20 @@ public class Manage {
 		
         }
         
+		/**
+		* Allow to delete a group.
+		* This function is called when we need to delete a group from the database with a button and a form
+		* @param email the email of the user (admin)
+		* @param name the name of the group	
+		* @throws SQLException
+		* @since 1.0
+		*/	
         //Supprimer un groupe via un formulaire + bouton
         @POST
 		@Path("groups_delete")
         @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-        public Response deleteGroup(               
+        public Response deleteGroup(
+		
 				@FormParam("email") String email,
 				@FormParam("name") String name) throws Exception
 		{
@@ -422,19 +527,32 @@ public class Manage {
 	         
 		}
 		
-		//Quitter un groupe via un formulaire + bouton
+		/**
+		* Allow to leave a group.
+		* This function is called when we need to pull a user from a group from the database with a button and a form
+		* @param email the email of the current user
+		* @param name the name of the group	
+		* @throws SQLException
+		* @since 1.0
+		*/	
 		@POST
 		@Path("groups_v5")
 		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-		public void leaveGroup(@FormParam("name") String name) throws SQLException{
+		public void leaveGroup(@FormParam("email") String email, @FormParam("name") String name) throws SQLException{
 			Connection connection = DBClass.returnConnection();
 			PreparedStatement ps = connection.prepareStatement("DELETE FROM user_group WHERE group_id = ? AND user_id = ?");
 			ps.setString(1,name);
-			ps.setString(2,currentUser.getEmail());
+			ps.setString(2,email);
 			ps.executeUpdate();
 		}
 		
-		//Renvoie sous format json tous les users
+		/**
+		* Allow to have all the users. 
+		* This function is called when we need to get all users from the database by using a JSON request
+		* @return jsonArray with all the users registered into the database
+		* @throws Exception
+		* @since 1.0
+		*/	
 		@GET
 		 @Path("users")
 		 @Produces(MediaType.APPLICATION_JSON)
@@ -485,16 +603,7 @@ public class Manage {
 				 	
 					//location = new java.net.URI("manage/user?email="+email);
 					location = new java.net.URI("../../profil.html");
-					
-					JSONObject jsonObject = jsonArray.getJSONObject(0);
-					String lastname = jsonObject.getString("lastname");
-					String firstname = jsonObject.getString("firstname");
-					String biography = jsonObject.getString("biography");
-					String theEmail = jsonObject.getString("email");
-					currentUser.setBiography(biography);
-					currentUser.setFirstname(firstname);
-					currentUser.setLastname(lastname);
-					currentUser.setEmail(mail);
+				
 					
 					return Response.temporaryRedirect(location).build();
 				} catch (URISyntaxException e) {

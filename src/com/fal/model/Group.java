@@ -10,6 +10,9 @@ public class Group {
 	private List<User> members;
 	private List<String> discussionBoard;
 	
+	public Group() {
+		super();
+	}
 	
 	/**
 	* Constructor.
