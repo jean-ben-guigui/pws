@@ -7,7 +7,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import javax.json.JsonObject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -298,8 +297,9 @@ public class Manage {
             }
         }
 		
-		//Supprimer un groupe via un formulaire + bouton
-        @Path("groups_jg")
+		//Rejoindre un groupe 
+        @POST
+		@Path("groups_jg")
         @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
         public String joinGroup(
                 @FormParam("name") String grName
@@ -316,6 +316,7 @@ public class Manage {
             return "";
         }
         
+        //Supprimer un groupe via un formulaire + bouton
 		public void deleteGroup(@FormParam("name") String name) throws SQLException
 		{
 			
@@ -329,7 +330,7 @@ public class Manage {
 				ToJSON tojson = new ToJSON();
 				JSONArray jsonArray;
 				jsonArray = tojson.toJSONArray(resultSet);
-				JsonObject obj = (JsonObject) jsonArray.getJSONObject(0);
+				JSONObject obj = jsonArray.getJSONObject(0);
 				String admin = jsonArray.toString();
 				if (admin.equals(currentUser.getEmail())){
 					PreparedStatement ps = connection.prepareStatement("DELETE FROM group WHERE name = ?");
