@@ -5,6 +5,25 @@
 <title>TOUS LES GROUPES</title>
 <link rel="stylesheet" href="css/bootstrap.css">
 <link rel="stylesheet" href="css/style.css">
+
+<script>
+function seeGroup(){
+	var email=document.getElementById('emailid').value;
+	$.getJSON('http://localhost:9090/pws/v1/manageApp/manage/showgroups, function(data) {
+	    var tbl_body = "";
+	    var odd_even = false;
+	    $.each(data, function() {
+	        var tbl_row = "";
+	        $.each(this, function(k , v) {
+	            tbl_row += "<td>"+v+"</td>";
+	        })
+	        tbl_body += "<tr class=\""+( odd_even ? "odd" : "even")+"\">"+tbl_row+"</tr>";
+	        odd_even = !odd_even;               
+	    })
+	    $("#target_table_id tbody").html(tbl_body);
+	});
+}
+</script>
 </head>
 
 <body>
@@ -14,6 +33,9 @@
 	<h1> groupe </h1>
 	<h1> groupe </h1>
 </div>
+
+<div id="target_table_id tbody"></div>
+
 <div class="container">
 	<form class="form-signin" method="POST" action="http://localhost:8080/wps/v1/converterApp/currencyConverter/groups_v2">
 		<h2 class="form-signin-heading">jOIN THE GROUP</h2>

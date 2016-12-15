@@ -77,8 +77,4 @@ public class User {
 		this.groups = groups;
 	}
 	
-	
-	
-	
-
 }

@@ -1,10 +1,38 @@
 <!DOCTYPE html>
-<html>
+<html >
 <head>
-<meta charset="ISO-8859-1">
-<title>Insert title here</title>
+
+<title>Create your account</title>
+<link rel="stylesheet" href="css/bootstrap.css">
+<link rel="stylesheet" href="css/signin.css">
 </head>
+
 <body>
-<h1>hello</h1>
+
+<div class="container">
+<h2>If you already have an account</h2>
+<form method="POST" action="profil.html">
+	<input type="submit" value="Click here" >
+</form>
+<!--  <form class="form-signin" method="GET" action="http://localhost:9090/pws/v1/manageApp/manage/user">
+  <h2 class="form-signin-heading">Sign in</h2>
+  <input class="form-control" type="text" required name="email" placeholder="Email Address">
+  <label class="checkbox"></label>
+  <button class="btn btn-lg btn-primary btn-block" type="submit">sign in</button>
+</form>-->
+</div>
+
+<div class="container">
+<form class="form-signin" method="POST" action="http://localhost:9090/pws/v1/manageApp/manage/users_v1">
+  <h2 class="form-signin-heading">Create an account</h2>
+  <input class="form-control" type="text" required name="email" placeholder="Email Address">
+  <input class="form-control" type="text" required name="lastname" placeholder="last name">
+  <input class="form-control" type="text" required name="firstname" placeholder="first name">
+    <input class="form-control" type="text" name="biography" placeholder="biographie">
+  <label class="checkbox"></label>
+  <button class="btn btn-lg btn-primary btn-block" type="submit">create an account</button>
+</form>
+</div>
+
 </body>
 </html>
