@@ -5,12 +5,11 @@
 <title>TOUS LES GROUPES</title>
 <link rel="stylesheet" href="css/bootstrap.css">
 <link rel="stylesheet" href="css/style.css">
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
 
 <script>
-function seeGroup(){
-	var email=document.getElementById('emailid').value;
-	$.getJSON('http://localhost:9090/pws/v1/manageApp/manage/showgroups, function(data) {
-	    var tbl_body = "";
+$.getJSON('http://localhost:9090/pws/v1/manageApp/manage/showgroups', function(data) {
+	 var tbl_body = "<tr><th>  name  </th> <th>  description </th><th>  admin </th></tr>";
 	    var odd_even = false;
 	    $.each(data, function() {
 	        var tbl_row = "";
@@ -20,28 +19,48 @@ function seeGroup(){
 	        tbl_body += "<tr class=\""+( odd_even ? "odd" : "even")+"\">"+tbl_row+"</tr>";
 	        odd_even = !odd_even;               
 	    })
-	    $("#target_table_id tbody").html(tbl_body);
+   $("#target_table_id").html(tbl_body);
+});
+
+function groupmembers(){
+	var group=document.getElementById('groupid').value;
+	$.getJSON('http://localhost:9090/pws/v1/manageApp/manage/groupmembers?group=' + group, function(data) {  
+		 var list = "";
+		    $.each(data, function() {
+		        list+=this.user_id +"<br/>";            
+		    })
+		  $("#members").html(list);
+		  
 	});
 }
 </script>
 </head>
 
 <body>
-<div class="container" method="GET" action="http://localhost:8080/wps/v1/converterApp/currencyConverter/get_groups">
-	<h1> groupe </h1>
-	<h1> groupe </h1>
-	<h1> groupe </h1>
-	<h1> groupe </h1>
+<div class="container">
+	<h1>TOUS LES GROUPES</h1>
 </div>
 
-<div id="target_table_id tbody"></div>
+<div id="target_table_id"></div>
 
 <div class="container">
-	<form class="form-signin" method="POST" action="http://localhost:8080/wps/v1/converterApp/currencyConverter/groups_v2">
-		<h2 class="form-signin-heading">jOIN THE GROUP</h2>
+	<form class="form-signin" method="POST" action="http://localhost:9090/pws/v1/manageApp/manage/groups_jg">
+		<h2 class="form-signin-heading">Join a group</h2>
+		<input class="form-control" type="text" required name="email" placeholder="your email">
 		<input class="form-control" type="text" required name="name" placeholder="name of the group">
-		<button class="btn btn-lg btn-primary btn-block" type="submit">jOIN</button>
+		<button class="btn btn-lg btn-primary btn-block" type="submit">JOIN</button>
 	</form>
-</DIV>
+</div>
+
+<div class="container">
+<form class="form-signin">
+<h2 class="form-signin-heading">See members </h2>
+<input class="form-control" id="groupid" type="text" required name="group" placeholder="group's name">
+<input type="button" onclick="groupmembers();" value="See members of this group">
+</form>
+</div>
+
+<div id="members"></div>
+
 </body>
 </html>

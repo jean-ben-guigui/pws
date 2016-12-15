@@ -5,31 +5,47 @@
 <title>groups</title>
 <link rel="stylesheet" href="css/bootstrap.css">
 <link rel="stylesheet" href="css/style.css">
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+
 
 <script>
-function seeGroup(){
-	var email=document.getElementById('emailid').value;
-	$.getJSON('http://localhost:9090/pws/v1/manageApp/manage/showgroups, function(data) {
-	    var tbl_body = "";
-	    var odd_even = false;
-	    $.each(data, function() {
-	        var tbl_row = "";
-	        $.each(this, function(k , v) {
-	            tbl_row += "<td>"+v+"</td>";
-	        })
-	        tbl_body += "<tr class=\""+( odd_even ? "odd" : "even")+"\">"+tbl_row+"</tr>";
-	        odd_even = !odd_even;               
-	    })
-	    $("#target_table_id tbody").html(tbl_body);
-	});
-}
+	
+	function seeGroup(){
+		var email=document.getElementById('emailid').value;
+		$.getJSON('http://localhost:9090/pws/v1/manageApp/manage/groupsjson?email='+ email, function(data) {
+		    var tbl_body = "<tr><th>  name  </th> <th>  description </th><th>  admin </th></tr>";
+		    var odd_even = false;
+		    $.each(data, function() {
+		        var tbl_row = "";
+		        $.each(this, function(k , v) {
+		            tbl_row += "<td>"+v+"</td>";
+		        })
+		        tbl_body += "<tr class=\""+( odd_even ? "odd" : "even")+"\">"+tbl_row+"</tr>";
+		        odd_even = !odd_even;               
+		    })
+		    $("#target_table_id").html(tbl_body);
+		});
+	}
 </script>
 </head>
 
 <body>
+
+
 <div class="container">
-	<h1> Les groupes... </h1>
+	<h1> Mes groupes </h1>
 </div>
+
+<BR/>
+<div class="container">
+<form class="form-signin">
+<input class="form-control" id="emailid" type="text" required name="email" placeholder="email">
+<input type="button" onclick="seeGroup();" value="see my groups">
+</form>
+</div>
+
+<div id="target_table_id" ></div>
+
 <div class="container">
 <form class="form-signin" method="POST" action="http://localhost:9090/pws/v1/manageApp/manage/groups_v1">
   <h2 class="form-signin-heading">Create a group</h2>
@@ -41,7 +57,7 @@ function seeGroup(){
 </div>
 
 <div class="container">
-	<form class="form-signin" method="POST" action="http://localhost:8080/wps/v1/converterApp/currencyConverter/groups_v2">
+	<form class="form-signin" method="POST" action="http://localhost:9090/pws/v1/manageApp/manage/groups_cgd">
 		<h2 class="form-signin-heading">Change group's description</h2>
 		<input class="form-control" type="text" required name="email" placeholder="email">
 		<input class="form-control" type="text" required name="name" placeholder="name of the group">
@@ -50,7 +66,7 @@ function seeGroup(){
 	</form>
 </div>
 <div class="container">
-	<form class="form-signin" method="POST" action="http://localhost:8080/wps/v1/converterApp/currencyConverter/delete_group">
+	<form class="form-signin" method="POST" action="http://localhost:9090/pws/v1/manageApp/manage/groups_delete">
 		<h2 class="form-signin-heading">Delete a group</h2>
 		  <input class="form-control" type="text" required name="email" placeholder="email">
 		<input class="form-control" type="text" required name="name" placeholder="name of the group">

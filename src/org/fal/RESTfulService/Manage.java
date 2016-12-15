@@ -34,27 +34,11 @@ public class Manage {
 	
 	private User currentUser = new User();;
 
-		@POST
-		@Path("sign-up")
-		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-		public void signUp(
-			@FormParam("email") String email,
-			@FormParam("lastname") String lastname,
-			@FormParam("firstname") String firstname,
-			@FormParam("biography") String biography) throws SQLException, IOException
-	{
-		currentUser.setEmail(email);
-		currentUser.setBiography(biography);
-		currentUser.setFirstname(firstname);
-		currentUser.setLastname(lastname);
-		
-		InsertUserIntoTheDataBase(currentUser);
-	}
 	
 	@POST
 	@Path("writeOnBoard")
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-	public void writeOnBoard(
+		public void writeOnBoard(
             @FormParam("message") String message,
     		@FormParam("group") String group) throws SQLException
 	{
@@ -64,7 +48,6 @@ public class Manage {
 		ps.setString(2,currentUser.getFirstname() + " " + currentUser.getLastname() + ": " + message);
 		ps.executeUpdate();
 	}
-	
 	
 		//Ajoute un utilisateur dans la bdd à partir du json
 		@POST
@@ -164,11 +147,11 @@ public class Manage {
 			ps.setString(2,lastname);
 			ps.setString(3,firstname);
 			ps.setString(4,biography);
-			ps.executeUpdate();
+			
 			
 			java.net.URI location;
 			try {
-				//location = new java.net.URI("manage/user?email="+email);
+				ps.executeUpdate();
 				location = new java.net.URI("../../profil.html");
 				return Response.seeOther(location).build();
 			} catch (URISyntaxException e) {
@@ -207,7 +190,7 @@ public class Manage {
 		@POST
 		@Path("groups_v1")
 		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-		public void addGroup(
+		public Response addGroup(
 				@FormParam("email") String email,
 				@FormParam("name") String name,
 	            @FormParam("description") String description
@@ -218,7 +201,17 @@ public class Manage {
 			ps.setString(1,name);
 			ps.setString(2,description);
 			ps.setString(3,email);
-			ps.executeUpdate();
+			
+			java.net.URI location;
+			try {
+				ps.executeUpdate();
+				location = new java.net.URI("../../myGroups.html");
+				return Response.seeOther(location).build();
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return Response.status(Status.ACCEPTED).build();
 		}
 		
 		//Changement du nom dans la bdd à partir d'un formulaire 
@@ -311,7 +304,7 @@ public class Manage {
 		@POST
         @Path("groups_cgd")
         @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-        public void changeGroupDescription(
+        public Response changeGroupDescription(
                 @FormParam("email") String email,
                 @FormParam("name") String name,
                 @FormParam("description") String newDescription
@@ -321,51 +314,81 @@ public class Manage {
             Connection connection = DBClass.returnConnection();
             
             PreparedStatement ps_admin = connection.prepareStatement(
-                    "SELECT admin FROM group WHERE name="+name
+                    "SELECT admin FROM groups WHERE name= ?"
             );
+            ps_admin.setString(1, name);
              ResultSet resultSet = ps_admin.executeQuery();
              ToJSON tojson = new ToJSON();
              JSONArray jsonArray = tojson.toJSONArray(resultSet);
             String adminGroup = jsonArray.toString();
-            if(adminGroup == currentUser.getEmail()){
+            JSONObject adminObject = jsonArray.getJSONObject(0);
+            adminGroup=adminObject.getString("admin");
+            java.net.URI location;
+            if(adminGroup.equals(email)){
                 PreparedStatement ps = connection.prepareStatement(
-                        "UPDATE group" 
-                        + "SET description=?"
-                        + "WHERE name=?");
+                        "UPDATE groups SET description= ? WHERE name= ? ");
                 ps.setString(1,newDescription);
                 ps.setString(2,name);
-                ps.executeUpdate();
+                
+    			try {
+    				ps.executeUpdate();
+    				location = new java.net.URI("../../myGroups.html");
+    				return Response.seeOther(location).build();
+    			} catch (URISyntaxException e) {
+    				e.printStackTrace();
+    				location = new java.net.URI("../../error.html");
+    				return Response.seeOther(location).build();
+
+    			}
+    			
             }
+            
+            location = new java.net.URI("../../error.html");
+			return Response.seeOther(location).build();
+
         }
 		
 		//Rejoindre un groupe 
         @POST
 		@Path("groups_jg")
         @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-        public String joinGroup(
+        public Response joinGroup(
+        		@FormParam("email") String email,
                 @FormParam("name") String grName
                 ) throws Exception
         {
             Connection connection = DBClass.returnConnection();
-            String uName = currentUser.getEmail();
             PreparedStatement ps = connection.prepareStatement(
-                    "INSERT INTO user_group (user_id,group_id)" + 
-                    "VALUES(?,?)"
+                    "INSERT INTO user_group (user_id,group_id) VALUES(?,?)"
                     );
-            ps.setString(1,uName);
+            ps.setString(1,email);
             ps.setString(2, grName);
-            return "";
+            
+            java.net.URI location;
+			try {
+				ps.executeUpdate();
+				location = new java.net.URI("../../groups.html");
+				return Response.seeOther(location).build();
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				location = new java.net.URI("../../error.html");
+				return Response.seeOther(location).build();
+			}
+		
         }
         
         //Supprimer un groupe via un formulaire + bouton
-		public void deleteGroup(               
+        @POST
+		@Path("groups_delete")
+        @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+        public Response deleteGroup(               
 				@FormParam("email") String email,
-				@FormParam("name") String name) throws SQLException
+				@FormParam("name") String name) throws Exception
 		{
 			
 			Connection connection = DBClass.returnConnection();
-			
-			try {
+			java.net.URI location;
 				
 				PreparedStatement ps0 = connection.prepareStatement("SELECT admin FROM groups WHERE name = ?");
 				ps0.setString(1,name);
@@ -373,25 +396,31 @@ public class Manage {
 				ToJSON tojson = new ToJSON();
 				JSONArray jsonArray;
 				jsonArray = tojson.toJSONArray(resultSet);
-				
-				JSONObject obj = jsonArray.getJSONObject(0);
-
-				String admin = jsonArray.toString();
-				if (admin.equals(email)){
-					PreparedStatement ps = connection.prepareStatement("DELETE FROM group WHERE name = ?");
+				String adminGroup = jsonArray.toString();
+	            JSONObject adminObject = jsonArray.getJSONObject(0);
+	            adminGroup=adminObject.getString("admin");
+	            
+	            if(adminGroup.equals(email)){
+	            	PreparedStatement ps = connection.prepareStatement("DELETE FROM groups WHERE name = ?");
 					ps.setString(1,name);
-					//ps.setString(3,admin); TROUVER UN MOYEN DE TROUVER L'ADMIN AUTOMATIQUEMENT SANS LE RENTRER
-					ps.executeUpdate();
-					PreparedStatement psbis = connection.prepareStatement("DELETE FROM user_group WHERE id_group = ?");
+					PreparedStatement psbis = connection.prepareStatement("DELETE FROM user_group WHERE group_id = ?");
 					psbis.setString(1,name);
-					psbis.executeUpdate();
-				}
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+	    			try {
+	    				ps.executeUpdate();
+	    				psbis.executeUpdate();
+	    				location = new java.net.URI("../../myGroups.html");
+	    				return Response.seeOther(location).build();
+	    			} catch (URISyntaxException e) {
+	    				e.printStackTrace();
+	    				location = new java.net.URI("../../error.html");
+	    				return Response.seeOther(location).build();
+	    			}
+	            }
+	            
+	            location = new java.net.URI("../../error.html");
+				return Response.seeOther(location).build();			
+	         
 		}
-		
 		
 		//Quitter un groupe via un formulaire + bouton
 		@POST
@@ -531,5 +560,21 @@ public class Manage {
 			 if(output.equals("[]"))
 				 return Response.status(412).build().toString(); 
 			 return output;
+		 }
+
+		@GET
+		 @Path("groupmembers")
+		 @Produces(MediaType.APPLICATION_JSON)
+		public String getMembers(@QueryParam ("group")String group) throws Exception{
+			 Connection connection = DBClass.returnConnection();
+			 PreparedStatement ps = connection.prepareStatement(
+					 "SELECT user_id FROM user_group WHERE group_id = ?"
+					 );
+			 ps.setString(1, group);
+			 ResultSet resultSet = ps.executeQuery();
+			 ToJSON tojson = new ToJSON();
+			 JSONArray jsonArray = tojson.toJSONArray(resultSet);
+			 
+			 return jsonArray.toString();
 		 }
 }
