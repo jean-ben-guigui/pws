@@ -13,7 +13,7 @@ public class Group {
 	
 	/**
 	* Constructor.
-	* This function is called when we create an Group object
+	* This function is called when we create a Group object
 	* @since 1.0
 	*/
 	public Group(String name, String description, String admin) {
