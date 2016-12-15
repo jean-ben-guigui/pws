@@ -30,28 +30,36 @@ import com.rest.util.ToJSON;
 
 @Path("manage")
 public class Manage {
+	private User currentUser = new User();
 	
-		private User currentUser = new User();
-		
-		@POST
-		@Path("sign-in")
-		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-		public void signIn(
-				@FormParam("email") String email) throws SQLException, IOException
-		{
-			Connection connection = DBClass.returnConnection();
-			PreparedStatement ps = connection.prepareStatement("SELECT email FROM user where email = ?");
-			ps.setString(1,email);
-			ResultSet rs = ps.executeQuery();
-			if(rs!=null){
-				
-			}
+	@POST
+	@Path("sign-in")
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	public Response signIn(
+			@FormParam("email") String email) throws SQLException, IOException
+	{
+		Connection connection = DBClass.returnConnection();
+		PreparedStatement ps = connection.prepareStatement("SELECT email FROM user where email = ?");
+		ps.setString(1,email);
+		ResultSet rs = ps.executeQuery();
+		if(rs!=null){
+			java.net.URI location;
+			try {
+				//location = new java.net.URI("manage/user?email="+email);
+				location = new java.net.URI("../../index.html");
+				return Response.seeOther(location).build();
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 		}
-		
+		}
+		return Response.status(Status.ACCEPTED).build();
+	}
+
 		@POST
 		@Path("sign-up")
 		@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-		public void signIn(
+		public void signUp(
 			@FormParam("email") String email,
 			@FormParam("lastname") String lastname,
 			@FormParam("firstname") String firstname,
@@ -64,6 +72,21 @@ public class Manage {
 		
 		InsertUserIntoTheDataBase(currentUser);
 	}
+	
+	@POST
+	@Path("writeOnBoard")
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	public void writeOnBoard(
+            @FormParam("message") String message,
+    		@FormParam("group") String group) throws SQLException
+	{
+		Connection connection = DBClass.returnConnection();
+		PreparedStatement ps = connection.prepareStatement("INSERT INTO board (group_id, message)" + "VALUES(?,?)");
+		ps.setString(1,group);
+		ps.setString(2,currentUser.getFirstname() + " " + currentUser.getLastname() + ": " + message);
+		ps.executeUpdate();
+	}
+	
 	
 		//Ajoute un utilisateur dans la bdd à partir du json
 		@POST
@@ -330,7 +353,9 @@ public class Manage {
 				ToJSON tojson = new ToJSON();
 				JSONArray jsonArray;
 				jsonArray = tojson.toJSONArray(resultSet);
+				
 				JSONObject obj = jsonArray.getJSONObject(0);
+
 				String admin = jsonArray.toString();
 				if (admin.equals(currentUser.getEmail())){
 					PreparedStatement ps = connection.prepareStatement("DELETE FROM group WHERE name = ?");
@@ -339,7 +364,6 @@ public class Manage {
 					ps.executeUpdate();
 					PreparedStatement psbis = connection.prepareStatement("DELETE FROM user_group WHERE id_group = ?");
 					psbis.setString(1,name);
-					//ps.setString(3,admin); TROUVER UN MOYEN DE TROUVER L'ADMIN AUTOMATIQUEMENT SANS LE RENTRER
 					psbis.executeUpdate();
 				}
 			} catch (Exception e) {
