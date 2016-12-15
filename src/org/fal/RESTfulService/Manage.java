@@ -568,6 +568,14 @@ public class Manage {
 			 return jsonArray.toString();
 		 }
 		 
+		/**
+		* Allow to get the user situated in the URL 
+		* This function is called when we need to get the user's which is in URL
+		* @param email the email of the user
+		* @return Response redirection on the user's profile
+		* @throws Exception
+		* @since 1.0
+		*/	
 		//Renvoie le user dont l'email est placé en paramètre dans l'url 
 		@GET
 		 @Path("user")
@@ -615,6 +623,14 @@ public class Manage {
 			 return Response.status(200).entity(output).build();
 		 }
 		
+		/**
+		* Allow to get the information of a user
+		* This function is called when we need to get the user's information as a JSONArray
+		* @param email the email of the user
+		* @return JSON with the user's information
+		* @throws Exception
+		* @since 1.0
+		*/	
 		@GET
 		 @Path("userjson")
 		 @Produces(MediaType.APPLICATION_JSON)
@@ -635,6 +651,14 @@ public class Manage {
 			 return output;
 		 }
 		
+		/**
+		* Allow to get the information of a group by usin the admin name
+		* This function is called when we need to get the group's information as a JSONArray by using the admin of this group
+		* @param email the email of the user (admin)
+		* @return JSON with the group's information
+		* @throws Exception
+		* @since 1.0
+		*/	
 		@GET
 		 @Path("groupsjson")
 		 @Produces(MediaType.APPLICATION_JSON)
@@ -655,6 +679,14 @@ public class Manage {
 			 return output;
 		 }
 		
+		/**
+		* Allow to display groups
+		* This function is called when we need display all groups registered into the database as a JSON Array
+		* @param email the email of the user
+		* @return JSON with the user's information
+		* @throws Exception
+		* @since 1.0
+		*/	
 		@GET
 		 @Path("showgroups")
 		 @Produces(MediaType.APPLICATION_JSON)
@@ -671,6 +703,14 @@ public class Manage {
 			 return output;
 		 }
 
+		/**
+		* Allow to get the members of a group
+		* This function is called when we need to get the members of a group as a JSONArray
+		* @param group the group 
+		* @return a string with the members of a group
+		* @throws Exception
+		* @since 1.0
+		*/	
 		@GET
 		 @Path("groupmembers")
 		 @Produces(MediaType.APPLICATION_JSON)
